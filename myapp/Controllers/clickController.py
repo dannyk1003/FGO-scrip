@@ -33,8 +33,9 @@ class Controller:
         print(result)
 
     
-    def on_combobox_click(self, title, func):
-        if func == 'battle1_skill':
-            result = 
+    def on_combobox_click(self, title, func, player, skill):
+        if func == 'battle1' or func == 'battle2' or func == 'battle3':
+            result = self.model.battle(title, func, player, skill)
+            print(result)
         
     

@@ -12,7 +12,6 @@ class View:
 
         self.times = tk.StringVar()
         self.get_hwnd = tk.StringVar()
-        self.to_who = ['None', 'P1', 'P2', 'P3']
 
         self.root.title('FGO Scrip')
         self.root.geometry('1000x800')
@@ -23,9 +22,9 @@ class View:
         
         self._make_label('Start&End', 0, 0)
         self._make_button('get hwnd', 'get_hwnd', 1, 0)
-        self._make_button('Start', 'Start&End', 1, 1)
-        self._make_button('End', 'Start&End', 1, 2)
-        self._make_get_hwnd_label(1, 3)
+        self._make_get_hwnd_label(1, 1)
+        self._make_button('Start', 'Start&End', 1, 2)
+        self._make_button('End', 'Start&End', 1, 3)
         self._make_label('Times', 2, 0)
         self._make_times_label(3, 0)
         self._make_button('-5', 'Times', 3, 1)
@@ -34,9 +33,9 @@ class View:
         self._make_button('+5', 'Times', 3, 4)
         self._make_button('unlimited', 'Times', 3, 5)
 
-        self._battle_area('Battle1', 4)
-        self._battle_area('Battle2', 11)
-        self._battle_area('Battle3', 18)
+        self._battle_area('Battle1', 'battle1', 4)
+        self._battle_area('Battle2', 'battle2', 11)
+        self._battle_area('Battle3', 'battle3', 18)
 
         
         self.root.mainloop()
@@ -94,13 +93,12 @@ class View:
         checkbutton.grid(row=x, column=y)
 
 
-    def _make_combobox(self, text, x, y):
+    def _make_combobox(self, text, func, x, y, player = None, skill = None):
         def combobox_func(event):
             title = combobox.get()
-            self.controller.on_
+            self.controller.on_combobox_click(title, func, player, skill)
 
-        combobox_Text = tk.StringVar()
-        combobox = ttk.Combobox(self.root, textvariable=combobox_Text, state='readonly')
+        combobox = ttk.Combobox(self.root, state='readonly')
         combobox['values'] = text
         combobox.grid(row=x, column=y)
         combobox.current(0)
@@ -108,29 +106,38 @@ class View:
         combobox.bind("<<ComboboxSelected>>", combobox_func)
 
 
-    def _battle_area(self, text, x):
+    def _battle_area(self, text, func, x):
+        c = 'clothes'
+        p1 = 'player1'
+        p2 = 'player2'
+        p3 = 'player3'
+        to_who = ['None', p1, p2, p3]
+        s1 = 'skill1'
+        s2 = 'skill2'
+        s3 = 'skill3'
+
         self._make_label(text, x, 0)
         self._make_label('clothesS1', x+1, 0)
-        self._make_combobox(self.to_who, x+2, 0)
+        self._make_combobox(to_who, func, x+2, 0, c, s1)
         self._make_label('P1S1', x+1, 1)
-        self._make_combobox(self.to_who, x+2, 1)
+        self._make_combobox(to_who, func, x+2, 1, p1, s1)
         self._make_label('P2S1', x+1, 2)
-        self._make_combobox(self.to_who, x+2, 2)
+        self._make_combobox(to_who, func, x+2, 2, p2, s1)
         self._make_label('P3S1', x+1, 3)
-        self._make_combobox(self.to_who, x+2, 3)
+        self._make_combobox(to_who, func, x+2, 3, p3, s1)
         self._make_label('clothesS2', x+3, 0)
-        self._make_combobox(self.to_who, x+4, 0)
+        self._make_combobox(to_who, func, x+4, 0, c, s2)
         self._make_label('P1S2', x+3, 1)
-        self._make_combobox(self.to_who, x+4, 1)
+        self._make_combobox(to_who, func, x+4, 1, p1, s2)
         self._make_label('P2S2', x+3, 2)
-        self._make_combobox(self.to_who, x+4, 2)
+        self._make_combobox(to_who, func, x+4, 2, p2, s2)
         self._make_label('P3S2', x+3, 3)
-        self._make_combobox(self.to_who, x+4, 3)
+        self._make_combobox(to_who, func, x+4, 3, p3, s2)
         self._make_label('clothesS3', x+5, 0)
-        self._make_combobox(self.to_who, x+6, 0)
+        self._make_combobox(to_who, func, x+6, 0, c, s3)
         self._make_label('P1S3', x+5, 1)
-        self._make_combobox(self.to_who, x+6, 1)
+        self._make_combobox(to_who, func, x+6, 1, p1, s3)
         self._make_label('P2S3', x+5, 2)
-        self._make_combobox(self.to_who, x+6, 2)
+        self._make_combobox(to_who, func, x+6, 2, p2, s3)
         self._make_label('P3S3', x+5, 3)
-        self._make_combobox(self.to_who, x+6, 3)        
+        self._make_combobox(to_who, func, x+6, 3, p3, s3)        
