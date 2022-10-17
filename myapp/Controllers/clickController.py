@@ -16,12 +16,21 @@ class Controller:
 
 
     def on_button_click(self, text, func):
+        result = None
         if func == 'get_hwnd':
             result = self.model.get_window()
             self.view.get_hwnd.set(result)
         elif func == 'Times':
             result = self.model.times_counter(text)
             self.view.times.set(result)
+        elif func == 'start':
+            result = self.model.get_window()
+            self.view.get_hwnd.set(result)
+            self.model.runScrip()
+        elif func == 'Save':
+            self.model.write_history(text)
+            self.view.get_history_title()
+
         print(result)
     
 
@@ -36,6 +45,13 @@ class Controller:
     def on_combobox_click(self, title, func, player, skill):
         if func == 'battle1' or func == 'battle2' or func == 'battle3':
             result = self.model.battle(title, func, player, skill)
-            print(result)
+        elif func == 'read_history':
+            result = self.model.read_history(title) 
+        print(result)
+
+
+    def on_times(self, times):
+        self.model.times
+        self.view.times.set(times)
         
     

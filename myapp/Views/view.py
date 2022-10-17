@@ -1,8 +1,8 @@
 # 顯示畫面
 
-from re import S
 import tkinter as tk
 from tkinter import ttk
+import os
 
 
 class View:
@@ -12,9 +12,12 @@ class View:
 
         self.times = tk.StringVar()
         self.get_hwnd = tk.StringVar()
+        self.history_name = tk.StringVar()
+        self.get_history_title()
 
         self.root.title('FGO Scrip')
         self.root.geometry('1000x800')
+        
         
 
 
@@ -23,8 +26,8 @@ class View:
         self._make_label('Start&End', 0, 0)
         self._make_button('get hwnd', 'get_hwnd', 1, 0)
         self._make_get_hwnd_label(1, 1)
-        self._make_button('Start', 'Start&End', 1, 2)
-        self._make_button('End', 'Start&End', 1, 3)
+        self._make_button('Start', 'start', 1, 2)
+        self._make_button('End', 'end', 1, 3)
         self._make_label('Times', 2, 0)
         self._make_times_label(3, 0)
         self._make_button('-5', 'Times', 3, 1)
@@ -37,6 +40,9 @@ class View:
         self._battle_area('Battle2', 'battle2', 11)
         self._battle_area('Battle3', 'battle3', 18)
 
+        self._make_label('Remember', 25, 0)
+        self._make_entry_withButton('Save', 26, 0)
+        self._make_combobox(self.history_title, 'read_history', 27, 0)
         
         self.root.mainloop()
 
@@ -141,3 +147,25 @@ class View:
         self._make_combobox(to_who, func, x+6, 2, p2, s3)
         self._make_label('P3S3', x+5, 3)
         self._make_combobox(to_who, func, x+6, 3, p3, s3)        
+
+
+    def _make_entry_withButton(self, func, x, y):
+
+        def button_event():
+            if entry_text.get() != '':
+                text = entry_text.get()
+                self.controller.on_button_click(text, func)
+
+        entry_text = tk.StringVar()
+        entry = tk.Entry(self.root, textvariable=entry_text)
+        entry.grid(row=x, column=y)
+
+        myButton = tk.Button(self.root, text = 'Save', command=button_event)
+        myButton.grid(row=x, column=y+1)
+
+
+    def get_history_title(self):
+        self.history_title = list()
+        title = os.listdir(r'.\history')
+        for i in title:
+            self.history_title.append(i.rstrip('.json'))
