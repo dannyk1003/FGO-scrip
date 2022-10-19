@@ -6,6 +6,8 @@ import pyautogui
 from PIL import Image
 import pytesseract
 import json
+from PyQt5.QtWidgets import QApplication
+import sys
 
 
 class Model:
@@ -122,8 +124,10 @@ class Model:
         y = position[1]
         hwnd = self.innerHwnd
         long_position = win32api.MAKELONG(int(x), int(y)) 
+        win32gui.SendMessage(hwnd, win32con.WM_ACTIVATE, win32con.WA_ACTIVE, 0)
         win32gui.PostMessage(hwnd, win32con.WM_LBUTTONDOWN, win32con.MK_LBUTTON, long_position)
         time.sleep(0.5)
+        win32gui.SendMessage(hwnd, win32con.WM_ACTIVATE, win32con.WA_ACTIVE, 0)
         win32gui.PostMessage(hwnd, win32con.WM_LBUTTONUP, win32con.MK_LBUTTON, long_position)
 
 
@@ -137,7 +141,6 @@ class Model:
         win32gui.PostMessage(hwnd, win32con.WM_LBUTTONDOWN, win32con.MK_LBUTTON, long_position1)
         time.sleep(2)
         win32gui.PostMessage(hwnd, win32con.WM_LBUTTONUP, win32con.MK_LBUTTON, long_position2)
-
 
     
     def runScrip(self):
@@ -232,12 +235,6 @@ class Model:
                     self.doClick(support_position)
                     time.sleep(5)
 
-                    # Start = pyautogui.locateOnScreen(r'img\Start.png', confidence=0.95)
-                    # Start_x = pyautogui.center(Start)[0] - win32gui.GetWindowRect(self.innerHwnd)[0]
-                    # Start_y = pyautogui.center(Start)[1] - win32gui.GetWindowRect(self.innerHwnd)[1]
-
-                    # Start_position = [Start_x, Start_y]
-                    # self.doClick(Start_position)
                     time.sleep(10)
                     
                     
@@ -290,7 +287,7 @@ class Model:
         # self.useSkill(1, 2, self.battleSkill['b1p1s2'])
         # self.useSkill(1, 3, self.battleSkill['b1p1s3'])
 
-        time.sleep(2)
+        time.sleep(4)
         for i in range(1, 4, 1):
             for j in range(1, 4, 1):
                 p = 'b' + str(n) + 'p' + str(i) + 's' + str(j)
@@ -307,13 +304,15 @@ class Model:
         if m == None:
             print('None')
         else:
-            clothes = [950, 250]
-            self.doClick(clothes)
-            time.sleep(2)
-            self.doClick(self.clothesSkill[n-1])
-            time.sleep(2)
-            self.doClick(self.toPlayer[m])
-            time.sleep(2)
+            # clothes = [950, 250]
+            clothes = self.locateOnImage('clothes', 'FGO_ScreenShot')
+            if clothes != None:
+                self.doClick(clothes)
+                time.sleep(2)
+                self.doClick(self.clothesSkill[n-1])
+                time.sleep(2)
+                self.doClick(self.toPlayer[m])
+                time.sleep(2)
 
 
     def useSkill(self, p, n, m): # player p 的第n個技能, 給player m
@@ -323,7 +322,8 @@ class Model:
             player = 'p' + str(p) + 's' + str(n)
             self.doClick(self.playerSkill[player])
             time.sleep(4)
-            img = pyautogui.locateOnScreen(r'img\Please_select_ object.png')
+            # img = pyautogui.locateOnScreen(r'img\Please_select_object.png')
+            img = self.locateOnImage('Please_select_object', 'FGO_ScreenShot')
             if img != None:
                 self.doClick(self.toPlayer[m])
             time.sleep(4)
@@ -353,6 +353,23 @@ class Model:
             self.battleSkill = json.load(fr)
         print(self.battleSkill)
         
+
+    def get_image(self, text):
+        app = QApplication(sys.argv)
+        screen = QApplication.primaryScreen()
+        img = screen.grabWindow(self.innerHwnd).toImage()
+        img.save(rf'img\screenShot\{text}.png')
+
+    
+    def locateOnImage(self, item, image):
+        self.get_image(image)
+        if pyautogui.locate(rf'img\{item}.png', rf'img\screenShot\{image}.png', confidence=0.95) != None:
+            x = pyautogui.locate(rf'img\{item}.png', rf'img\screenShot\{image}.png', confidence=0.95)[0]
+            y = pyautogui.locate(rf'img\{item}.png', rf'img\screenShot\{image}.png', confidence=0.95)[1]
+            return [x, y]
+        else:
+            return None
+
 
 
 
