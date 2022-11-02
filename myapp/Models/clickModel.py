@@ -4,10 +4,10 @@ import numpy as np
 import time
 import pyautogui
 from PIL import Image
-import pytesseract
 import json
 from PyQt5.QtWidgets import QApplication
 import sys
+import cv2
 
 
 class Model:
@@ -23,15 +23,15 @@ class Model:
         self.battle1_clothes = [0, 0, 0]
         self.battle2_clothes = [0, 0, 0]
         self.battle3_clothes = [0, 0, 0]
-        self.battleSkill = {'b1cs1': None, 'b1p1s1': None, 'b1p2s1': None, 'b1p3s1': None, 
-                            'b1cs2': None, 'b1p1s2': None, 'b1p2s2': None, 'b1p3s2': None, 
-                            'b1cs3': None, 'b1p1s3': None, 'b1p2s3': None, 'b1p3s3': None,
-                            'b2cs1': None, 'b2p1s1': None, 'b2p2s1': None, 'b2p3s1': None,
-                            'b2cs2': None, 'b2p1s2': None, 'b2p2s2': None, 'b2p3s2': None,
-                            'b2cs3': None, 'b2p1s3': None, 'b2p2s3': None, 'b2p3s3': None,
-                            'b3cs1': None, 'b3p1s1': None, 'b3p2s1': None, 'b3p3s1': None,
-                            'b3cs2': None, 'b3p1s2': None, 'b3p2s2': None, 'b3p3s2': None,
-                            'b3cs3': None, 'b3p1s3': None, 'b3p2s3': None, 'b3p3s3': None,
+        self.battleSkill = {'b1p0s1': None, 'b1p1s1': None, 'b1p2s1': None, 'b1p3s1': None, 
+                            'b1p0s2': None, 'b1p1s2': None, 'b1p2s2': None, 'b1p3s2': None, 
+                            'b1p0s3': None, 'b1p1s3': None, 'b1p2s3': None, 'b1p3s3': None,
+                            'b2p0s1': None, 'b2p1s1': None, 'b2p2s1': None, 'b2p3s1': None,
+                            'b2p0s2': None, 'b2p1s2': None, 'b2p2s2': None, 'b2p3s2': None,
+                            'b2p0s3': None, 'b2p1s3': None, 'b2p2s3': None, 'b2p3s3': None,
+                            'b3p0s1': None, 'b3p1s1': None, 'b3p2s1': None, 'b3p3s1': None,
+                            'b3p0s2': None, 'b3p1s2': None, 'b3p2s2': None, 'b3p3s2': None,
+                            'b3p0s3': None, 'b3p1s3': None, 'b3p2s3': None, 'b3p3s3': None,
                             }  
         
 
@@ -109,7 +109,7 @@ class Model:
     def battle(self, title, func, player, skill):
         k = ''
         if player == 'clothes':
-            k = func[0] + func[-1] + player[0] + skill[0] + skill[-1]
+            k = func[0] + func[-1] + 'p0' + skill[0] + skill[-1]
         else:
             k = func[0] + func[-1] + player[0] + player[-1] + skill[0] + skill[-1]
 
@@ -149,44 +149,16 @@ class Model:
             shell = win32com.client.Dispatch("WScript.Shell")
             shell.SendKeys('%')
             win32gui.SetForegroundWindow(self.hwnd)
-            # win32gui.MoveWindow(innerHwnd, 0, 0, 1000, 600, True)
-            time.sleep(2)
+            win32gui.MoveWindow(self.hwnd, True, True, 934, 540, True)
+            time.sleep(0.5)
 
 
             while self.times > 0: # 次數大於一次時
                 print('剩餘次數', self.times)
 
-                self.startBattle(1) # battle 1
-                # time.sleep(20)
-                # while True:
-                #     battle1Img = pyautogui.locateOnScreen(r'img\Battle1-3.png', confidence=0.9)
-                #     if battle1Img == None:
-                #         print('next')
-                #         break
-                #     self.useAttack()
-                #     time.sleep(20)
-                
-                self.startBattle(2) # battle 2
-                # time.sleep(20)
+                for i in range(1, 4):
+                    self.startBattle(i)
 
-                # while True:
-                #     battle2Img = pyautogui.locateOnScreen(r'img\Battle2-3.png', confidence=0.9)
-                #     if battle2Img == None:
-                #         print('next')
-                #         break
-                #     self.useAttack()
-                #     time.sleep(20)
-
-                self.startBattle(3) # battle 3
-                # time.sleep(20)
-
-                # while True:
-                #     battle3Img = pyautogui.locateOnScreen(r'img\Battle3-3.png', confidence=0.9)
-                #     if battle3Img == None:
-                #         print('next')
-                #         break
-                #     self.useAttack()
-                #     time.sleep(20)
 
                 with_servent_connect = pyautogui.locateOnScreen(r'img\with_servent_connect.png', confidence=0.95)
                 while with_servent_connect != None:
@@ -252,7 +224,8 @@ class Model:
         y_long = win32gui.GetWindowRect(self.innerHwnd)[3] - win32gui.GetWindowRect(self.innerHwnd)[1]
 
 
-        self.playerSkill = {'p1s1': [x_long * 0.055, y_long * 0.8], 'p1s2': [x_long * 0.125, y_long * 0.8], 'p1s3': [x_long * 0.195, y_long * 0.8],
+        self.playerSkill = {'p0s1': [x_long * 0.705, y_long * 0.425], 'p0s2':[x_long * 0.775, y_long * 0.425], 'p0s3': [x_long * 0.845, y_long * 0.425],
+                            'p1s1': [x_long * 0.055, y_long * 0.8], 'p1s2': [x_long * 0.125, y_long * 0.8], 'p1s3': [x_long * 0.195, y_long * 0.8],
                             'p2s1': [x_long * 0.305, y_long * 0.8], 'p2s2': [x_long * 0.375, y_long * 0.8], 'p2s3': [x_long * 0.445, y_long * 0.8],
                             'p3s1': [x_long * 0.555, y_long * 0.8], 'p3s2': [x_long * 0.625, y_long * 0.8], 'p3s3': [x_long * 0.695, y_long * 0.8]}
 
@@ -260,51 +233,63 @@ class Model:
         self.clothes = [x_long * 0.935, y_long * 0.425]
 
         self.toPlayer = {'player1': [x_long * 0.265, y_long * 0.655],'player2': [x_long * 0.5, y_long * 0.655],'player3': [x_long * 0.735, y_long * 0.655]}
-        self.clothesSkill = [[x_long * 0.705, y_long * 0.425], [x_long * 0.775, y_long * 0.425], [x_long * 845, y_long * 0.425]]
+        self.clothesSkill = [[x_long * 0.705, y_long * 0.425], [x_long * 0.775, y_long * 0.425], [x_long * 0.845, y_long * 0.425]]
         self.big = [[x_long * 0.325, y_long * 0.32], [x_long * 0.5, y_long * 0.32], [x_long * 0.675, y_long * 0.32]]
         self.small = [[x_long * 0.1, y_long * 0.743], [x_long * 0.3, y_long * 0.743], [x_long * 0.5, y_long * 0.743], [x_long * 0.7, y_long * 0.743], [x_long * 0.9, y_long * 0.743]]
         self.middle = [x_long * 0.5, y_long * 0.5]
         self.next = [x_long * 0.87, y_long * 0.895]
 
+
     def startBattle(self, n): # battle n
         print('now is battle', n)
         self.position()
 
-        self.useClothes(1, self.battleSkill['b' + str(n) + 'cs1'])
-        self.useClothes(2, self.battleSkill['b' + str(n) + 'cs2'])
-        self.useClothes(3, self.battleSkill['b' + str(n) + 'cs3'])
-
-        time.sleep(4)
-
-        for i in range(1, 4, 1):
-            for j in range(1, 4, 1):
-                p = 'b' + str(n) + 'p' + str(i) + 's' + str(j)
-                self.useSkill(i, j, self.battleSkill[p])
-
-        time.sleep(2)
-        
-        self.useAttack()
-
         while True:
-            while True:
-                clothes_position = self.locateOnImage('clothes', 'FGO_ScreenShot') # 確認是否回到選技能畫面
-                if clothes_position != None:
-                    break
-                else:
-                    time.sleep(5)
+            battle_count_position = self.CheckBattleCount(n)
+            print(battle_count_position)
 
-            battle_count_position = self.locateOnImage(f'Battle{n}-3', 'FGO_ScreenShot') # 確認是否已經過了 Battle n
             if battle_count_position == None:
                 break
+
             else:
-                self.useAttack()
+
+                # self.useClothes(1, self.battleSkill['b' + str(n) + 'cs1'])
+                # self.useClothes(1, self.battleSkill['b' + str(n) + 'cs2'])
+                # self.useClothes(1, self.battleSkill['b' + str(n) + 'cs3'])
+
+                # time.sleep(4)
+
+                for i in range(4):
+                    for j in range(1, 4, 1):
+                        p = 'b' + str(n) + 'p' + str(i) + 's' + str(j)
+                        print(p)
+                        self.useSkill(i, j, self.battleSkill[p])
+
+                time.sleep(4)
+
+                while True:
+                    while True:
+                        clothes_position = self.locateOnImage('clothes', 'FGO_ScreenShot') # 確認是否回到選技能畫面
+                        if clothes_position != None:
+                            break
+                        else:
+                            time.sleep(5)
+
+                    battle_count_position = self.CheckBattleCount(n) # 確認是否已經過了 Battle n
+                    print('battle count', battle_count_position)
+                    if battle_count_position != None:
+                        self.useAttack()
+                    else:
+                        break
+            
+
+        print('battle ', n, ' end')
+
 
 
 
     def useClothes(self, n, m): # 第n個clothes技能, 給player m
-        if m == None:
-            pass
-        else:
+        if m != None:
             clothes_position = self.locateOnImage('clothes', 'FGO_ScreenShot')
             print('clothes_position is', clothes_position)
             if clothes_position != None:
@@ -317,17 +302,28 @@ class Model:
 
 
     def useSkill(self, p, n, m): # player p 的第n個技能, 給player m
-        if m == None:
-            pass
-        else:
+        if m != None:
             player = 'p' + str(p) + 's' + str(n)
+            print(player)
+            if p == 0:
+                self.doClick(self.clothes)
+                time.sleep(1)
+            
             self.doClick(self.playerSkill[player])
             time.sleep(4)
             # img = pyautogui.locateOnScreen(r'img\Please_select_object.png')
-            img = self.locateOnImage('Please_select_object', 'FGO_ScreenShot')
-            if img != None:
-                self.doClick(self.toPlayer[m])
-            time.sleep(4)
+
+            if self.skill_used_check() != None:
+                self.doClick(self.skill_used_check())
+                time.sleep(2)
+                if p == 0:
+                    self.doClick(self.clothes)
+                    time.sleep(1)
+            else:
+                img = self.locateOnImage('Please_select_object', 'FGO_ScreenShot')
+                if img != None:
+                    self.doClick(self.toPlayer[m])
+                time.sleep(4)
 
     def useAttack(self):
         self.position()
@@ -358,13 +354,21 @@ class Model:
         
 
     def get_image(self, text):
+        win32gui.MoveWindow(self.hwnd, True, True, 934, 540, True)
+        time.sleep(0.5)
+
         app = QApplication(sys.argv)
         screen = QApplication.primaryScreen()
         img = screen.grabWindow(self.innerHwnd).toImage()
         img.save(rf'img\screenShot\{text}.png')
 
+        return rf'img\screenShot\{text}.png'
+
     
     def locateOnImage(self, item, image):
+        win32gui.MoveWindow(self.hwnd, True, True, 960, 540, True)
+        time.sleep(0.5)
+
         self.get_image(image)
         if pyautogui.locate(rf'img\{item}.png', rf'img\screenShot\{image}.png', confidence=0.95) != None:
             x = pyautogui.locate(rf'img\{item}.png', rf'img\screenShot\{image}.png', confidence=0.95)[0]
@@ -373,7 +377,60 @@ class Model:
         else:
             return None
 
+    
+    def CheckBattleCount(self, count):
+        win32gui.MoveWindow(self.hwnd, True, True, 960, 540, True)
+        time.sleep(0.5)
+
+        Now = self.get_image('Now')
+        Now_cut = rf'img\screenShot\Now_cut_{count}.png'
+        Now_cut_black = rf'img\screenShot\Now_cut_{count}_black.png'
+        BattleCount = rf'img\BattleCount\Battle{count}.png'
+        self.image_cut(Now, Now_cut, 620, 0, 633, 30)
+        self.WordToBlack(Now_cut, Now_cut_black)
+
+        if pyautogui.locate(Now_cut_black, BattleCount, confidence=0.8) != None :
+
+            x = pyautogui.locate(Now_cut_black, BattleCount, confidence=0.8)[0]
+            y = pyautogui.locate(Now_cut_black, BattleCount, confidence=0.8)[1]
+            return [x, y]
+        else:
+            return None
+        
+    
+    def WordToBlack(self, before, after):
+        img = cv2.imread(before)
+
+        imgToBlack = np.array(img)
+        for i in range(len(img)):
+            for j in range(len(img[i])):
+                if (img[i][j][0] == img[i][j][1]) & (img[i][j][1] == img[i][j][2]) & (img[i][j][0] >= 80):
+                    imgToBlack[i][j][0] = 0
+                    imgToBlack[i][j][1] = 0
+                    imgToBlack[i][j][2] = 0
+                else:
+                    imgToBlack[i][j][0] = 255
+                    imgToBlack[i][j][1] = 255
+                    imgToBlack[i][j][2] = 255
+
+        cv2.imwrite(after, imgToBlack)
 
 
+    def image_cut(self, before, after, x_start, y_start, x_end, y_end): # 620, 0, 633, 30 這個位置是battle幾
+        img = Image.open(before)
+        new_img = img.crop((x_start, y_start, x_end, y_end))  # (left, upper, right, lower)
+        new_img.save(after)
+
+
+    def skill_used_check(self):
+        Now = self.get_image('Now')
+        cancel = rf'img\cancel.png'
+        if pyautogui.locate(cancel, Now, confidence=0.8) != None :
+            print(pyautogui.locate(cancel, Now, confidence=0.8))
+            x = pyautogui.locate(cancel, Now, confidence=0.8)[0]
+            y = pyautogui.locate(cancel, Now, confidence=0.8)[1]
+            return [x, y]
+        else:
+            return None
 
 
