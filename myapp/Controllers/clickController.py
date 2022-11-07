@@ -47,6 +47,11 @@ class Controller:
             result = self.model.battle(title, func, player, skill)
         elif func == 'read_history':
             result = self.model.read_history(title) 
+        elif func == 'support':
+            # self.model.select_support['type'] = title[0]
+            # self.model.select_support['supporter'] = title[1]
+            result = self.model.select_support(title)
+            # result = self.model.select_support
         print(result)
 
 

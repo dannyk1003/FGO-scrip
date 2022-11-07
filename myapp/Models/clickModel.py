@@ -19,6 +19,7 @@ class Model:
         self.innerHwnd = ''
         self.connect = ''
         self.history_title = list()
+        # self.select_support = {'type':'', 'supporter': ''}
 
         self.battle1_clothes = [0, 0, 0]
         self.battle2_clothes = [0, 0, 0]
@@ -149,17 +150,25 @@ class Model:
             shell = win32com.client.Dispatch("WScript.Shell")
             shell.SendKeys('%')
             win32gui.SetForegroundWindow(self.hwnd)
-            win32gui.MoveWindow(self.hwnd, True, True, 934, 540, True)
-            time.sleep(0.5)
+            # win32gui.MoveWindow(self.hwnd, True, True, 934, 540, True)
+            # time.sleep(0.5)
 
 
             while self.times > 0: # 次數大於一次時
                 print('剩餘次數', self.times)
 
+
+
                 for i in range(1, 4):
                     self.startBattle(i)
+                    
+                print('battle end')
+                self.doClick([50, 50])
 
 
+
+
+                '''
                 with_servent_connect = pyautogui.locateOnScreen(r'img\with_servent_connect.png', confidence=0.95)
                 while with_servent_connect != None:
                     self.doClick(self.middle)
@@ -206,7 +215,7 @@ class Model:
                     time.sleep(5)
 
                     time.sleep(10)
-                    
+                    '''
                     
                 
                 
@@ -238,6 +247,7 @@ class Model:
         self.small = [[x_long * 0.1, y_long * 0.743], [x_long * 0.3, y_long * 0.743], [x_long * 0.5, y_long * 0.743], [x_long * 0.7, y_long * 0.743], [x_long * 0.9, y_long * 0.743]]
         self.middle = [x_long * 0.5, y_long * 0.5]
         self.next = [x_long * 0.87, y_long * 0.895]
+        self.support = [x_long * 0.07, ]
 
 
     def startBattle(self, n): # battle n
@@ -252,32 +262,31 @@ class Model:
                 break
 
             else:
-
-                # self.useClothes(1, self.battleSkill['b' + str(n) + 'cs1'])
-                # self.useClothes(1, self.battleSkill['b' + str(n) + 'cs2'])
-                # self.useClothes(1, self.battleSkill['b' + str(n) + 'cs3'])
-
-                # time.sleep(4)
-
                 for i in range(4):
                     for j in range(1, 4, 1):
                         p = 'b' + str(n) + 'p' + str(i) + 's' + str(j)
                         print(p)
                         self.useSkill(i, j, self.battleSkill[p])
 
-                time.sleep(4)
+                # time.sleep(4)
 
-                while True:
+                while True:  # function
                     while True:
                         clothes_position = self.locateOnImage('clothes', 'FGO_ScreenShot') # 確認是否回到選技能畫面
+                        with_servent_connect_position = self.locateOnImage('with_servent_connect', 'FGO_ScreenShot')
                         if clothes_position != None:
                             break
+                        elif with_servent_connect_position != None:
+                            print('with_servent_connect_position')
+                            return 0
+
                         else:
                             time.sleep(5)
 
                     battle_count_position = self.CheckBattleCount(n) # 確認是否已經過了 Battle n
                     print('battle count', battle_count_position)
                     if battle_count_position != None:
+
                         self.useAttack()
                     else:
                         break
@@ -351,12 +360,14 @@ class Model:
         with open(rf'history\{text}.json','r') as fr:
             self.battleSkill = json.load(fr)
         print(self.battleSkill)
-        
+
+
+    def SizeTest(self, text):
+        img = Image.open(rf'img\screenShot\{text}.png')
+        return img.size
+
 
     def get_image(self, text):
-        win32gui.MoveWindow(self.hwnd, True, True, 934, 540, True)
-        time.sleep(0.5)
-
         app = QApplication(sys.argv)
         screen = QApplication.primaryScreen()
         img = screen.grabWindow(self.innerHwnd).toImage()
@@ -364,12 +375,22 @@ class Model:
 
         return rf'img\screenShot\{text}.png'
 
+
+    def get_900_506_image(self, text):
+        self.get_image(text)
+        while True:
+            if self.SizeTest(text) != (900, 506):
+                win32gui.MoveWindow(self.hwnd, True, True, 934, 540, True)
+                time.sleep(0.5)
+                self.get_image(text)
+            else:
+                break
+        return rf'img\screenShot\{text}.png'
+
     
     def locateOnImage(self, item, image):
-        win32gui.MoveWindow(self.hwnd, True, True, 960, 540, True)
-        time.sleep(0.5)
 
-        self.get_image(image)
+        self.get_900_506_image(image)
         if pyautogui.locate(rf'img\{item}.png', rf'img\screenShot\{image}.png', confidence=0.95) != None:
             x = pyautogui.locate(rf'img\{item}.png', rf'img\screenShot\{image}.png', confidence=0.95)[0]
             y = pyautogui.locate(rf'img\{item}.png', rf'img\screenShot\{image}.png', confidence=0.95)[1]
@@ -379,10 +400,11 @@ class Model:
 
     
     def CheckBattleCount(self, count):
-        win32gui.MoveWindow(self.hwnd, True, True, 960, 540, True)
-        time.sleep(0.5)
+        # win32gui.MoveWindow(self.hwnd, True, True, 960, 540, True)
+        # time.sleep(0.5)
 
-        Now = self.get_image('Now')
+        # Now = self.get_image('Now')
+        Now = self.get_900_506_image('Now')
         Now_cut = rf'img\screenShot\Now_cut_{count}.png'
         Now_cut_black = rf'img\screenShot\Now_cut_{count}_black.png'
         BattleCount = rf'img\BattleCount\Battle{count}.png'
@@ -423,7 +445,8 @@ class Model:
 
 
     def skill_used_check(self):
-        Now = self.get_image('Now')
+        # Now = self.get_image('Now')
+        Now = self.get_900_506_image('Now')
         cancel = rf'img\cancel.png'
         if pyautogui.locate(cancel, Now, confidence=0.8) != None :
             print(pyautogui.locate(cancel, Now, confidence=0.8))
@@ -432,5 +455,19 @@ class Model:
             return [x, y]
         else:
             return None
+
+    
+    def select_support(self, title):
+
+        support = {'type': title[0], 'supporter': title[1]}
+        support_type_location = self.locateOnImage(rf'\Support\{title[0]}', 'ScreenShot')
+        time.sleep(1)
+        self.doClick(support_type_location)
+        supporter_location = self.locateOnImage(rf'\Support\{title[1]}', 'ScreenShot')
+        time.sleep(1)
+        self.doClick(supporter_location)
+
+        return support
+
 
 

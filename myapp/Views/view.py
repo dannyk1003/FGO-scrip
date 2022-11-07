@@ -13,6 +13,7 @@ class View:
         self.get_hwnd = tk.StringVar()
         self.history_name = tk.StringVar()
         self.get_history_title()
+        self.get_support_title()
 
         self.root.title('FGO Scrip')
         self.root.geometry('1000x800')
@@ -35,13 +36,15 @@ class View:
         self._make_button('+5', 'Times', 3, 4)
         self._make_button('unlimited', 'Times', 3, 5)
 
-        self._battle_area('Battle1', 'battle1', 4)
-        self._battle_area('Battle2', 'battle2', 11)
-        self._battle_area('Battle3', 'battle3', 18)
+        self._support_area(4, 'support')
 
-        self._make_label('Remember', 25, 0)
-        self._make_entry_withButton('Save', 26, 0)
-        self._make_combobox(self.history_title, 'read_history', 27, 0)
+        self._battle_area('Battle1', 'battle1', 6)
+        self._battle_area('Battle2', 'battle2', 13)
+        self._battle_area('Battle3', 'battle3', 20)
+
+        self._make_label('Remember', 27, 0)
+        self._make_entry_withButton('Save', 28, 0)
+        self._make_combobox(self.history_title, 'read_history', 29, 0)
         
         self.root.mainloop()
 
@@ -111,6 +114,29 @@ class View:
         combobox.bind("<<ComboboxSelected>>", combobox_func)
 
 
+    def _support_area(self, x, func):
+        self._make_label('Support', x, 0)
+        def type_func(event):
+            support_type = combobox_type.get()
+
+            combobox_supporter['values'] = self.supporter[support_type]
+            print(self.supporter[support_type])
+            
+        def supporter_func(event):
+            supporter = combobox_supporter.get()
+            self.controller.on_combobox_click([combobox_type.get(), supporter], func, None, None)
+
+        combobox_type = ttk.Combobox(self.root, state='readonly')
+        combobox_type['values'] = self.support_type
+        combobox_type.grid(row=x+1, column=0)
+        combobox_type.bind("<<ComboboxSelected>>", type_func)
+
+        combobox_supporter = ttk.Combobox(self.root, state='readonly')
+        combobox_supporter.grid(row=x+1, column=1)
+        combobox_supporter.bind("<<ComboboxSelected>>", supporter_func)
+        
+        
+
     def _battle_area(self, text, func, x):
         c = 'clothes'
         p1 = 'player1'
@@ -168,3 +194,13 @@ class View:
         title = os.listdir(r'.\history')
         for i in title:
             self.history_title.append(i.rstrip('.json'))
+
+    
+    def get_support_title(self):
+        self.support_type = ['all', 'saber', 'archer', 'lancer', 'rider', 'caster', 'assassin', 'berserker', 'other', 'mix']
+        self.supporter = {'all': list(), 'saber': list(), 'archer': list(), 'lancer': list(), 'rider': list(), 'caster': list(), 'assassin': list(), 'berserker': list(), 'other': list(), 'mix': list()}
+        # title = os.listdir(rf'.\img\Support\{type}')
+        for i in self.support_type:
+            title = os.listdir(rf'.\img\Support\{i}')
+            for j in title:
+                self.supporter[i].append(j.rstrip('.png'))
