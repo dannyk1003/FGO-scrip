@@ -154,8 +154,8 @@ class Model:
             # time.sleep(0.5)
 
 
-            while self.times > 0: # 次數大於一次時
-                print('剩餘次數', self.times)
+            for times in range(self.times): # 次數大於一次時
+                print('剩餘次數', times)
 
 
 
