@@ -163,12 +163,12 @@ class Model:
                     self.startBattle(i)
                     
                 print('battle end')
-                self.doClick([50, 50])
+                # self.doClick([50, 50])
+
+            print('success')
 
 
-
-
-                '''
+            '''
                 with_servent_connect = pyautogui.locateOnScreen(r'img\with_servent_connect.png', confidence=0.95)
                 while with_servent_connect != None:
                     self.doClick(self.middle)
@@ -215,7 +215,7 @@ class Model:
                     time.sleep(5)
 
                     time.sleep(10)
-                    '''
+            '''
                     
                 
                 
