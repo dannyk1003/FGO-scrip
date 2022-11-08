@@ -129,6 +129,7 @@ class Model:
         time.sleep(0.5)
         win32gui.SendMessage(hwnd, win32con.WM_ACTIVATE, win32con.WA_ACTIVE, 0)
         win32gui.PostMessage(hwnd, win32con.WM_LBUTTONUP, win32con.MK_LBUTTON, long_position)
+        time.sleep(0.5)
 
 
     def doDrag(self, position1, position2):
@@ -155,9 +156,15 @@ class Model:
 
 
             for times in range(self.times): # 次數大於一次時
-                print('剩餘次數', times)
+                print('剩餘次數', self.times)
+                print('第', times, '次')
 
+                self.select_support()
 
+                mission_start_location = self.locateOnImage('mission_start', 'ScreenShot')
+                if mission_start_location != None:
+                    self.doClick(mission_start_location)
+                
 
                 for i in range(1, 4):
                     self.startBattle(i)
@@ -247,7 +254,6 @@ class Model:
         self.small = [[x_long * 0.1, y_long * 0.743], [x_long * 0.3, y_long * 0.743], [x_long * 0.5, y_long * 0.743], [x_long * 0.7, y_long * 0.743], [x_long * 0.9, y_long * 0.743]]
         self.middle = [x_long * 0.5, y_long * 0.5]
         self.next = [x_long * 0.87, y_long * 0.895]
-        self.support = [x_long * 0.07, ]
 
 
     def startBattle(self, n): # battle n
@@ -392,8 +398,9 @@ class Model:
 
         self.get_900_506_image(image)
         if pyautogui.locate(rf'img\{item}.png', rf'img\screenShot\{image}.png', confidence=0.95) != None:
-            x = pyautogui.locate(rf'img\{item}.png', rf'img\screenShot\{image}.png', confidence=0.95)[0]
-            y = pyautogui.locate(rf'img\{item}.png', rf'img\screenShot\{image}.png', confidence=0.95)[1]
+            # x = pyautogui.locate(rf'img\{item}.png', rf'img\screenShot\{image}.png', confidence=0.95)[0]
+            # y = pyautogui.locate(rf'img\{item}.png', rf'img\screenShot\{image}.png', confidence=0.95)[1]
+            x, y = pyautogui.center(pyautogui.locate(rf'img\{item}.png', rf'img\screenShot\{image}.png', confidence=0.95))
             return [x, y]
         else:
             return None
@@ -457,17 +464,49 @@ class Model:
             return None
 
     
-    def select_support(self, title):
+    def select_support(self):
 
-        support = {'type': title[0], 'supporter': title[1]}
-        support_type_location = self.locateOnImage(rf'\Support\{title[0]}', 'ScreenShot')
-        time.sleep(1)
+        support_type_location = self.locateOnImage(rf"\Support\{self.supporter['type']}", 'ScreenShot')
         self.doClick(support_type_location)
-        supporter_location = self.locateOnImage(rf'\Support\{title[1]}', 'ScreenShot')
-        time.sleep(1)
-        self.doClick(supporter_location)
 
-        return support
+        supporter_location = self.locateOnImage(rf"\Support\{self.supporter['type']}\{self.supporter['supporter']}", 'ScreenShot')
+        print(supporter_location)
+
+        if supporter_location != None:
+            time.sleep(1)
+            self.doClick(supporter_location)
+        else:
+            i = 0
+            while i != 10:
+                i += 1
+                go_down_location = self.locateOnImage(rf"\Support\go_down", 'ScreenShot')
+                if go_down_location == None:
+                    re_new_list_location = self.locateOnImage(rf"\Support\re_new_list", 'ScreenShot')
+                    self.doClick(re_new_list_location)
+                    time.sleep(1)
+                    yes_location = self.locateOnImage(rf"\Support\yes", 'ScreenShot')
+                    self.doClick(yes_location)
+                    time.sleep(1)
+                    i = 0
+                else:
+                    self.doClick(go_down_location)
+                    time.sleep(1)
+                
+                supporter_location = self.locateOnImage(rf"\Support\{self.supporter['type']}\{self.supporter['supporter']}", 'ScreenShot')
+
+                if supporter_location != None:
+                    time.sleep(1)
+                    self.doClick(supporter_location)
+                    break
+                
+        print('select end')
+
+
+    def support(self, title):
+        self.supporter = {'type': title[0], 'supporter': title[1]}
+
+        return self.supporter
+
 
 
 
