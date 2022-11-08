@@ -34,6 +34,7 @@ class Model:
                             'b3p0s2': None, 'b3p1s2': None, 'b3p2s2': None, 'b3p3s2': None,
                             'b3p0s3': None, 'b3p1s3': None, 'b3p2s3': None, 'b3p3s3': None,
                             }  
+        self.apple = ''
         
 
 
@@ -154,23 +155,30 @@ class Model:
             # win32gui.MoveWindow(self.hwnd, True, True, 934, 540, True)
             # time.sleep(0.5)
 
-
+            self.doClick(self.mission)
+            time.sleep(1)
             for times in range(self.times): # 次數大於一次時
                 print('剩餘次數', self.times)
                 print('第', times, '次')
 
+                self.AP_recovery()
+
                 self.select_support()
 
-                mission_start_location = self.locateOnImage('mission_start', 'ScreenShot')
-                if mission_start_location != None:
-                    self.doClick(mission_start_location)
-                
+                # mission_start_location = self.locateOnImage('mission_start', 'ScreenShot')
+                # if mission_start_location != None:
+                #     self.doClick(mission_start_location)
+
 
                 for i in range(1, 4):
                     self.startBattle(i)
                     
                 print('battle end')
-                # self.doClick([50, 50])
+                
+                self.go_again()
+                self.times -= 1
+
+                
 
             print('success')
 
@@ -254,9 +262,12 @@ class Model:
         self.small = [[x_long * 0.1, y_long * 0.743], [x_long * 0.3, y_long * 0.743], [x_long * 0.5, y_long * 0.743], [x_long * 0.7, y_long * 0.743], [x_long * 0.9, y_long * 0.743]]
         self.middle = [x_long * 0.5, y_long * 0.5]
         self.next = [x_long * 0.87, y_long * 0.895]
+        self.mission = [x_long * 0.7, y_long * 0.26]
 
 
     def startBattle(self, n): # battle n
+        self.main_screen()
+        
         print('now is battle', n)
         self.position()
 
@@ -276,31 +287,58 @@ class Model:
 
                 # time.sleep(4)
 
-                while True:  # function
-                    while True:
-                        clothes_position = self.locateOnImage('clothes', 'FGO_ScreenShot') # 確認是否回到選技能畫面
-                        with_servent_connect_position = self.locateOnImage('with_servent_connect', 'FGO_ScreenShot')
-                        if clothes_position != None:
-                            break
-                        elif with_servent_connect_position != None:
-                            print('with_servent_connect_position')
-                            return 0
 
-                        else:
-                            time.sleep(5)
 
-                    battle_count_position = self.CheckBattleCount(n) # 確認是否已經過了 Battle n
-                    print('battle count', battle_count_position)
-                    if battle_count_position != None:
-
-                        self.useAttack()
-                    else:
+                while True:
+                    self.main_screen()
+                    self.useAttack()
+                    self.main_screen()
+                    battle_count_position = self.CheckBattleCount(n)
+                    with_servent_connect_position = self.locateOnImage('with_servent_connect', 'FGO_ScreenShot')
+                    if battle_count_position == None:
                         break
+                    elif with_servent_connect_position != None:
+                        break
+                break
+
+                # while True:  # function
+                #     while True:
+                #         clothes_position = self.locateOnImage('clothes', 'FGO_ScreenShot') # 確認是否回到選技能畫面
+                #         with_servent_connect_position1 = self.locateOnImage('with_servent_connect', 'FGO_ScreenShot')
+                #         if clothes_position != None:
+                #             break
+                #         elif with_servent_connect_position1 != None:
+                #             print('with_servent_connect_position1')
+                #             return 0
+
+                #         else:
+                #             time.sleep(5)
+
+                #     battle_count_position = self.CheckBattleCount(n) # 確認是否已經過了 Battle n
+                #     print('battle count', battle_count_position)
+                #     if battle_count_position != None:
+
+                #         self.useAttack()
+                #     else:
+                #         break
             
 
         print('battle ', n, ' end')
 
 
+    def main_screen(self):
+        clothes_position = self.locateOnImage('clothes', 'ScreenShot')
+        with_servent_connect_position = self.locateOnImage('with_servent_connect', 'FGO_ScreenShot')
+
+        while True:
+            if clothes_position != None:
+                break
+            elif with_servent_connect_position != None:
+                break
+            else:
+                time.sleep(5)
+                clothes_position = self.locateOnImage('clothes', 'ScreenShot')
+                with_servent_connect_position = self.locateOnImage('with_servent_connect', 'FGO_ScreenShot')
 
 
     def useClothes(self, n, m): # 第n個clothes技能, 給player m
@@ -465,6 +503,11 @@ class Model:
 
     
     def select_support(self):
+        while True:
+            time.sleep(2)
+            support_choose_position = self.locateOnImage(rf"\Support\support_choose", 'ScreenShot')
+            if support_choose_position != None:
+                break
 
         support_type_location = self.locateOnImage(rf"\Support\{self.supporter['type']}", 'ScreenShot')
         self.doClick(support_type_location)
@@ -498,7 +541,11 @@ class Model:
                     time.sleep(1)
                     self.doClick(supporter_location)
                     break
-                
+        time.sleep(1)
+        mission_start_position = self.locateOnImage(rf"\Support\mission_start", 'ScreenShot')
+        if mission_start_position != None:
+            self.doClick(mission_start_position)
+        
         print('select end')
 
 
@@ -508,5 +555,36 @@ class Model:
         return self.supporter
 
 
+    def go_again(self):
+        while True:
+            go_again_position = self.locateOnImage(rf"go_again", 'ScreenShot')
+            close_position = self.locateOnImage(rf"close", 'ScreenShot')
+            if go_again_position == None:
+                if close_position == None:
+                    self.doClick(self.next)
+                    time.sleep(0.5)
+                else:
+                    last_time_position = self.locateOnImage(rf"last_time", 'ScreenShot')
+                    self.doClick(last_time_position)
+                    break
+            else:
+                self.doClick(go_again_position)
+                break
 
 
+    def AP_recovery(self):
+        self.apple = 'bronze'
+        gold_position = self.locateOnImage(rf"\AP_Recovery\gold", 'ScreenShot')
+        if gold_position != None:
+            while True:
+                apple_position = self.locateOnImage(rf"\AP_Recovery\{self.apple}", 'ScreenShot')
+                if apple_position != None:
+                    self.doClick(apple_position)
+                    time.sleep(1)
+                    sure_position = self.locateOnImage(rf"\AP_Recovery\sure", 'ScreenShot')
+                    self.doClick(sure_position)
+                    break
+                else:
+                    go_down_position = self.locateOnImage(rf"\AP_Recovery\go_down", 'ScreenShot')
+                    self.doClick(go_down_position)
+                    time.sleep(1)
