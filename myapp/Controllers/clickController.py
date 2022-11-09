@@ -1,5 +1,7 @@
 # 點擊流程
 import sys
+import threading
+
 sys.path.append('..')
 
 from Models.clickModel import Model
@@ -9,6 +11,7 @@ class Controller:
     def __init__(self):
         self.model = Model()
         self.view = View(self)
+        
 
 
     def main(self):
@@ -26,12 +29,24 @@ class Controller:
         elif func == 'start':
             result = self.model.get_window()
             self.view.get_hwnd.set(result)
-            self.model.runScrip()
+            # self.model.runScrip()
+            # thread_start = threading.Thread(target=self.model.runScrip, )
+            # thread_start.start()
+            
+            thread_start = threading.Thread(target=self.start, )
+            thread_start.daemon = True
+            thread_start.start()
+        elif func == 'end':
+            sys.exit()
+            
         elif func == 'Save':
             self.model.write_history(text)
             self.view.get_history_title()
 
         print(result)
+    
+    def start(self):
+        self.model.runScrip()
     
 
     def on_checkbutton_click(self, text, func, check):

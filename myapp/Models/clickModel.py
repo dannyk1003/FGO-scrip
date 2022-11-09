@@ -8,6 +8,7 @@ import json
 from PyQt5.QtWidgets import QApplication
 import sys
 import cv2
+import pythoncom
 
 
 class Model:
@@ -145,15 +146,23 @@ class Model:
         win32gui.PostMessage(hwnd, win32con.WM_LBUTTONUP, win32con.MK_LBUTTON, long_position2)
 
     
+    def window_to_front(self):
+        shell = win32com.client.Dispatch("WScript.Shell")
+        shell.SendKeys('%')
+        win32gui.SetForegroundWindow(self.hwnd)
+
+
     def runScrip(self):
+        pythoncom.CoInitialize()
 
         if self.connect == 'Success': # 連線成功
 
-            shell = win32com.client.Dispatch("WScript.Shell")
-            shell.SendKeys('%')
-            win32gui.SetForegroundWindow(self.hwnd)
+            # shell = win32com.client.Dispatch("WScript.Shell")
+            # shell.SendKeys('%')
+            # win32gui.SetForegroundWindow(self.hwnd)
             # win32gui.MoveWindow(self.hwnd, True, True, 934, 540, True)
             # time.sleep(0.5)
+            self.window_to_front()
 
             self.doClick(self.mission)
             time.sleep(1)
