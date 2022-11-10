@@ -155,6 +155,10 @@ class Model:
     def runScrip(self):
         pythoncom.CoInitialize()
 
+        # while True:
+        #     time.sleep(1)
+        #     print('on going')
+
         if self.connect == 'Success': # 連線成功
 
             # shell = win32com.client.Dispatch("WScript.Shell")

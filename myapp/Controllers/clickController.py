@@ -1,6 +1,8 @@
 # 點擊流程
 import sys
 import threading
+import inspect
+import ctypes
 
 sys.path.append('..')
 
@@ -11,11 +13,28 @@ class Controller:
     def __init__(self):
         self.model = Model()
         self.view = View(self)
+        self.thread_start = 'No'
         
 
 
     def main(self):
         self.view.main()
+
+    
+    def _async_raise(self, tid, exctype):
+        tid = ctypes.c_long(tid)
+        if not inspect.isclass(exctype):
+            exctype = type(exctype)
+
+        res = ctypes.pythonapi.PyThreadState_SetAsyncExc(tid, ctypes.py_object(exctype))
+        if res == 0:
+            raise ValueError('invalid thread id')
+        elif res != 1:
+            ctypes.pythonapi.PyThreadState_SetAsyncExc(tid, None)
+            raise SystemError('PyThreadState_SetAsync failed')
+
+    def stop_thread(self, thread):
+        self._async_raise(thread.ident, SystemExit)
 
 
     def on_button_click(self, text, func):
@@ -32,12 +51,16 @@ class Controller:
             # self.model.runScrip()
             # thread_start = threading.Thread(target=self.model.runScrip, )
             # thread_start.start()
-            
-            thread_start = threading.Thread(target=self.start, )
-            thread_start.daemon = True
-            thread_start.start()
+            if self.thread_start == 'No':
+                self.thread_start = threading.Thread(target=self.start, )
+                self.thread_start.start()
         elif func == 'end':
-            sys.exit()
+            if self.thread_start == 'No':
+                print('No Thread')
+            else:
+                self.stop_thread(self.thread_start)
+                print(self.thread_start)
+                self.thread_start = 'No'
             
         elif func == 'Save':
             self.model.write_history(text)

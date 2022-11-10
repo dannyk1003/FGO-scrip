@@ -200,7 +200,10 @@ class View:
         self.support_type = ['all', 'saber', 'archer', 'lancer', 'rider', 'caster', 'assassin', 'berserker', 'other', 'mix']
         self.supporter = {'all': list(), 'saber': list(), 'archer': list(), 'lancer': list(), 'rider': list(), 'caster': list(), 'assassin': list(), 'berserker': list(), 'other': list(), 'mix': list()}
         # title = os.listdir(rf'.\img\Support\{type}')
-        for i in self.support_type:
-            title = os.listdir(rf'.\img\Support\{i}')
-            for j in title:
-                self.supporter[i].append(j.rstrip('.png'))
+        if os.path.isfile('.\img\Support'):
+            for i in self.support_type:
+                title = os.listdir(rf'.\img\Support\{i}')
+                for j in title:
+                    self.supporter[i].append(j.rstrip('.png'))
+        else:
+            print('No Supporter')
