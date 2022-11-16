@@ -9,9 +9,10 @@ from PyQt5.QtWidgets import QApplication
 import sys
 import cv2
 import pythoncom
+# from statusModel import statusModel
 
 
-class Model:
+class clickModel:
     def __init__(self):
         self.times = 0
         self.window = 'BlueStacks App Player'
@@ -19,12 +20,7 @@ class Model:
         self.hwnd = ''
         self.innerHwnd = ''
         self.connect = ''
-        self.history_title = list()
-        # self.select_support = {'type':'', 'supporter': ''}
 
-        self.battle1_clothes = [0, 0, 0]
-        self.battle2_clothes = [0, 0, 0]
-        self.battle3_clothes = [0, 0, 0]
         self.battleSkill = {'b1p0s1': None, 'b1p1s1': None, 'b1p2s1': None, 'b1p3s1': None, 
                             'b1p0s2': None, 'b1p1s2': None, 'b1p2s2': None, 'b1p3s2': None, 
                             'b1p0s3': None, 'b1p1s3': None, 'b1p2s3': None, 'b1p3s3': None,
@@ -34,30 +30,8 @@ class Model:
                             'b3p0s1': None, 'b3p1s1': None, 'b3p2s1': None, 'b3p3s1': None,
                             'b3p0s2': None, 'b3p1s2': None, 'b3p2s2': None, 'b3p3s2': None,
                             'b3p0s3': None, 'b3p1s3': None, 'b3p2s3': None, 'b3p3s3': None,
-                            }  
+                            }
         self.apple = ''
-        
-
-
-    def main(self):
-        print('here is model')
-
-
-    def times_counter(self, text):
-        if text == '-5':
-            self.times -= 5
-        elif text == '-1':
-            self.times -= 1
-        elif text == '+1':
-            self.times += 1
-        elif text == '+5':
-            self.times += 5
-
-        
-        if self.times <= 0:
-            self.times = 0
-
-        return self.times
 
 
     def get_window(self):
@@ -86,41 +60,6 @@ class Model:
         return self.connect
 
 
-    def start_scrip(self):
-        pass
-
-
-    def use_clothes_check(self, text, check):
-        if check == 0:
-            if text == 'A':
-                self.battle1_clothes[0] = 0
-            elif text == 'B':
-                self.battle1_clothes[1] = 0
-            elif text == 'C':
-                self.battle1_clothes[2] = 0
-        elif check == 1:
-            if text == 'A':
-                self.battle1_clothes[0] = 1
-            elif text == 'B':
-                self.battle1_clothes[1] = 1
-            elif text == 'C':
-                self.battle1_clothes[2] = 1            
-        
-        return self.battle1_clothes
-
-    
-    def battle(self, title, func, player, skill):
-        k = ''
-        if player == 'clothes':
-            k = func[0] + func[-1] + 'p0' + skill[0] + skill[-1]
-        else:
-            k = func[0] + func[-1] + player[0] + player[-1] + skill[0] + skill[-1]
-
-        self.battleSkill[k] = title
-
-        return self.battleSkill
-
-
     def doClick(self, position):
         x = position[0]
         y = position[1]
@@ -133,27 +72,18 @@ class Model:
         win32gui.PostMessage(hwnd, win32con.WM_LBUTTONUP, win32con.MK_LBUTTON, long_position)
         time.sleep(0.5)
 
-
-    def doDrag(self, position1, position2):
-        x1, x2 = position1[0], position2[0]
-        y1, y2 = position1[1], position2[1]
-        hwnd = self.innerHwnd
-        long_position1 = win32api.MAKELONG(int(x1), int(y1)) 
-        long_position2 = win32api.MAKELONG(int(x2), int(y2)) 
-
-        win32gui.PostMessage(hwnd, win32con.WM_LBUTTONDOWN, win32con.MK_LBUTTON, long_position1)
-        time.sleep(2)
-        win32gui.PostMessage(hwnd, win32con.WM_LBUTTONUP, win32con.MK_LBUTTON, long_position2)
-
-    
+   
     def window_to_front(self):
         shell = win32com.client.Dispatch("WScript.Shell")
         shell.SendKeys('%')
         win32gui.SetForegroundWindow(self.hwnd)
 
 
-    def runScrip(self):
+    def runScrip(self, now_status_support, now_status_skill):
         pythoncom.CoInitialize()
+        self.supporter = now_status_support
+        self.battleSkill = now_status_skill
+        self.times = 1
 
         # while True:
         #     time.sleep(1)
@@ -161,97 +91,30 @@ class Model:
 
         if self.connect == 'Success': # 連線成功
 
-            # shell = win32com.client.Dispatch("WScript.Shell")
-            # shell.SendKeys('%')
-            # win32gui.SetForegroundWindow(self.hwnd)
-            # win32gui.MoveWindow(self.hwnd, True, True, 934, 540, True)
-            # time.sleep(0.5)
             self.window_to_front()
 
-            self.doClick(self.mission)
-            time.sleep(1)
-            for times in range(self.times): # 次數大於一次時
-                print('剩餘次數', self.times)
-                print('第', times, '次')
+            # self.doClick(self.mission)
+            # time.sleep(1)
+            # for times in range(self.times): # 次數大於一次時
+            self.go_again()
 
-                self.AP_recovery()
+            # print('剩餘次數', self.times)
+            # print('第', times, '次')
 
-                self.select_support()
+            self.AP_recovery()
 
-                # mission_start_location = self.locateOnImage('mission_start', 'ScreenShot')
-                # if mission_start_location != None:
-                #     self.doClick(mission_start_location)
+            self.select_support()
 
 
-                for i in range(1, 4):
-                    self.startBattle(i)
-                    
-                print('battle end')
+            for i in range(1, 4):
+                self.startBattle(i)
                 
-                self.go_again()
-                self.times -= 1
-
-                
+            print('battle end')
+            
+            # self.go_again()
+            # self.times -= 1            
 
             print('success')
-
-
-            '''
-                with_servent_connect = pyautogui.locateOnScreen(r'img\with_servent_connect.png', confidence=0.95)
-                while with_servent_connect != None:
-                    self.doClick(self.middle)
-                    time.sleep(5)
-                    with_servent_connect = pyautogui.locateOnScreen(r'img\with_servent_connect.png', confidence=0.95)
-                
-                masterEXP = pyautogui.locateOnScreen(r'img\masterEXP.png', confidence=0.95)
-                while masterEXP != None:
-                    self.doClick(self.middle)
-                    time.sleep(5)
-                    masterEXP = pyautogui.locateOnScreen(r'img\masterEXP.png', confidence=0.95)
-                
-                click_to_see_result = pyautogui.locateOnScreen(r'img\click_to_see_result.png', confidence=0.95)
-                while click_to_see_result != None:
-                    self.doClick(self.next)
-                    time.sleep(5)
-                    click_to_see_result = pyautogui.locateOnScreen(r'img\click_to_see_result.png', confidence=0.95)
-
-                self.times -= 1
-                if self.times > 0:
-                    go_again = pyautogui.locateOnScreen(r'img\go_again.png', confidence=0.95)
-                    if go_again != None:
-                        go_again_x = pyautogui.center(go_again)[0] - win32gui.GetWindowRect(self.innerHwnd)[0]
-                        go_again_y = pyautogui.center(go_again)[1] - win32gui.GetWindowRect(self.innerHwnd)[1]
-                        go_again_position = [go_again_x, go_again_y]
-                        self.doClick(go_again_position)
-                
-                    time.sleep(10)
-                    
-                    support = pyautogui.locateOnScreen(r'img\Scathach.png', confidence=0.95)
-                    while support == None:
-                        go_down = pyautogui.locateOnScreen(r'img\go_down.png', confidence=0.95)
-                        go_down_x = pyautogui.center(go_down)[0] - win32gui.GetWindowRect(self.innerHwnd)[0]
-                        go_down_y = pyautogui.center(go_down)[1] - win32gui.GetWindowRect(self.innerHwnd)[1]
-                        go_down_position = [go_down_x, go_down_y]
-                        self.doClick(go_down_position)
-                        time.sleep(2)
-                        support = pyautogui.locateOnScreen(r'img\Scathach.png', confidence=0.95)
-
-                    support_x = pyautogui.center(support)[0] - win32gui.GetWindowRect(self.innerHwnd)[0]
-                    support_y = pyautogui.center(support)[1] - win32gui.GetWindowRect(self.innerHwnd)[1]
-                    support_position = [support_x, support_y]
-                    self.doClick(support_position)
-                    time.sleep(5)
-
-                    time.sleep(10)
-            '''
-                    
-                
-                
-
-
-
-
-
 
 
     def position(self):
@@ -298,9 +161,6 @@ class Model:
                         print(p)
                         self.useSkill(i, j, self.battleSkill[p])
 
-                # time.sleep(4)
-
-
 
                 while True:
                     self.main_screen()
@@ -313,27 +173,6 @@ class Model:
                     elif with_servent_connect_position != None:
                         break
                 break
-
-                # while True:  # function
-                #     while True:
-                #         clothes_position = self.locateOnImage('clothes', 'FGO_ScreenShot') # 確認是否回到選技能畫面
-                #         with_servent_connect_position1 = self.locateOnImage('with_servent_connect', 'FGO_ScreenShot')
-                #         if clothes_position != None:
-                #             break
-                #         elif with_servent_connect_position1 != None:
-                #             print('with_servent_connect_position1')
-                #             return 0
-
-                #         else:
-                #             time.sleep(5)
-
-                #     battle_count_position = self.CheckBattleCount(n) # 確認是否已經過了 Battle n
-                #     print('battle count', battle_count_position)
-                #     if battle_count_position != None:
-
-                #         self.useAttack()
-                #     else:
-                #         break
             
 
         print('battle ', n, ' end')
@@ -352,19 +191,6 @@ class Model:
                 time.sleep(5)
                 clothes_position = self.locateOnImage('clothes', 'ScreenShot')
                 with_servent_connect_position = self.locateOnImage('with_servent_connect', 'FGO_ScreenShot')
-
-
-    def useClothes(self, n, m): # 第n個clothes技能, 給player m
-        if m != None:
-            clothes_position = self.locateOnImage('clothes', 'FGO_ScreenShot')
-            print('clothes_position is', clothes_position)
-            if clothes_position != None:
-                self.doClick(clothes_position)
-                time.sleep(2)
-                self.doClick(self.clothesSkill[n-1])
-                time.sleep(2)
-                self.doClick(self.toPlayer[m])
-                time.sleep(2)
 
 
     def useSkill(self, p, n, m): # player p 的第n個技能, 給player m
@@ -406,17 +232,6 @@ class Model:
             time.sleep(2)
         
         time.sleep(20)
-
-
-    def write_history(self, title):
-        with open(rf'history\{title}.json','w') as fw:
-            json.dump(self.battleSkill,fw)
-    
-
-    def read_history(self, text):
-        with open(rf'history\{text}.json','r') as fr:
-            self.battleSkill = json.load(fr)
-        print(self.battleSkill)
 
 
     def SizeTest(self, text):
@@ -562,12 +377,6 @@ class Model:
         print('select end')
 
 
-    def support(self, title):
-        self.supporter = {'type': title[0], 'supporter': title[1]}
-
-        return self.supporter
-
-
     def go_again(self):
         while True:
             go_again_position = self.locateOnImage(rf"go_again", 'ScreenShot')
@@ -578,8 +387,12 @@ class Model:
                     time.sleep(0.5)
                 else:
                     last_time_position = self.locateOnImage(rf"last_time", 'ScreenShot')
-                    self.doClick(last_time_position)
-                    break
+                    if last_time_position == None:
+                        self.doClick(self.mission)
+                        break
+                    else:
+                        self.doClick(last_time_position)
+                        break
             else:
                 self.doClick(go_again_position)
                 break

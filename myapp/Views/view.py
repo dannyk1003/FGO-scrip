@@ -3,15 +3,26 @@ import tkinter as tk
 from tkinter import ttk
 import os
 
+import sys
+sys.path.append('..')
+# from Controllers.clickController import clickController
+# from Controllers.statusController import statusController
+
 
 class View:
-    def __init__(self, controller):
-        self.controller = controller
+    def __init__(self, statusController, clickController):
+        self.statusController = statusController
+        self.clickController = clickController
         self.root = tk.Tk()
 
         self.times = tk.StringVar()
         self.get_hwnd = tk.StringVar()
         self.history_name = tk.StringVar()
+        self.now_status_skill = tk.StringVar()
+        self.now_status_support = tk.StringVar()
+        self.support = ''
+        self.skill = ''
+        self.time = 0
         self.get_history_title()
         self.get_support_title()
 
@@ -45,7 +56,11 @@ class View:
         self._make_label('Remember', 27, 0)
         self._make_entry_withButton('Save', 28, 0)
         self._make_combobox(self.history_title, 'read_history', 29, 0)
-        
+
+        self._make_label('Now Status', 30, 0)
+        self._make_now_status_support_label(31, 0)
+        self._make_now_status_skill_label(32, 0)
+
         self.root.mainloop()
 
 
@@ -63,7 +78,19 @@ class View:
 
         def button_event():
             print(func)
-            self.controller.on_button_click(text, func)
+            if func == 'get_hwnd':
+                self.get_hwnd.set(self.statusController.on_button_click(text, func))
+            elif func == 'Times':
+                self.times.set(self.statusController.on_button_click(text, func))
+                self.time = self.statusController.on_button_click(text, func)
+            elif func == 'Save':
+                self.get_history_title()
+            elif func == 'start':
+                self.clickController.on_button_click(text, func, self.support, self.skill, self.time)
+            elif func == 'end':
+                self.clickController.on_button_click(text, func)
+            
+            
 
         button_Text = tk.StringVar()
         button = ttk.Button(self.root, text=button_Text, command=button_event)
@@ -84,14 +111,25 @@ class View:
         times = ttk.Entry(self.root, textvariable=self.times, state='disabled')
         times.grid(row=x, column=y)
 
+
     def _make_get_hwnd_label(self, x, y):
         get_hwnd = ttk.Entry(self.root, textvariable=self.get_hwnd, state='disabled')
         get_hwnd.grid(row=x, column=y)
 
+
+    def _make_now_status_support_label(self, x, y):
+        now_status_support = tk.Label(self.root, textvariable=self.now_status_support, state='disabled', wraplength=600)
+        now_status_support.grid(row=x, column=y, columnspan=4)
+
+
+    def _make_now_status_skill_label(self, x, y):
+        now_status_skill = tk.Label(self.root, textvariable=self.now_status_skill, state='disabled', wraplength=600)
+        now_status_skill.grid(row=x, column=y, columnspan=4)
+
     
     def _make_checkbutton(self, text, func, x, y):
         def checkbutton_event():
-            self.controller.on_checkbutton_click(text, func, var.get())
+            self.statusController.on_checkbutton_click(text, func, var.get())
             print(text, var.get())
 
         checkbutton_Text = tk.StringVar()
@@ -104,7 +142,15 @@ class View:
     def _make_combobox(self, text, func, x, y, player = None, skill = None):
         def combobox_func(event):
             title = combobox.get()
-            self.controller.on_combobox_click(title, func, player, skill)
+            if func == 'battle1' or func == 'battle2' or func == 'battle3':
+                self.now_status_skill.set(self.statusController.on_combobox_click(title, func, player, skill))
+                self.skill = self.statusController.on_combobox_click(title, func, player, skill)
+            elif func == 'read_history':
+                self.now_status_support.set(self.statusController.on_combobox_click(title, func, player, skill)[0])
+                self.support = self.statusController.on_combobox_click(title, func, player, skill)[0]
+                self.now_status_skill.set(self.statusController.on_combobox_click(title, func, player, skill)[1])
+                self.skill = self.statusController.on_combobox_click(title, func, player, skill)[1]
+
 
         combobox = ttk.Combobox(self.root, state='readonly')
         combobox['values'] = text
@@ -124,7 +170,8 @@ class View:
             
         def supporter_func(event):
             supporter = combobox_supporter.get()
-            self.controller.on_combobox_click([combobox_type.get(), supporter], func, None, None)
+            self.now_status_support.set(self.statusController.on_combobox_click([combobox_type.get(), supporter], func, None, None))
+            self.support = self.statusController.on_combobox_click([combobox_type.get(), supporter], func, None, None)
 
         combobox_type = ttk.Combobox(self.root, state='readonly')
         combobox_type['values'] = self.support_type
@@ -179,7 +226,7 @@ class View:
         def button_event():
             if entry_text.get() != '':
                 text = entry_text.get()
-                self.controller.on_button_click(text, func)
+                self.statusController.on_button_click(text, func)
 
         entry_text = tk.StringVar()
         entry = tk.Entry(self.root, textvariable=entry_text)
@@ -191,9 +238,13 @@ class View:
 
     def get_history_title(self):
         self.history_title = list()
-        title = os.listdir(r'.\history')
-        for i in title:
-            self.history_title.append(i.rstrip('.json'))
+        if os.path.isdir(r'.\history\battleSkill'):
+            title = os.listdir(r'.\history\battleSkill')
+            for i in title:
+                self.history_title.append(i.rstrip('.json'))
+        else:
+            self.history_title.append(None)
+
 
     
     def get_support_title(self):
@@ -206,4 +257,5 @@ class View:
                 for j in title:
                     self.supporter[i].append(j.rstrip('.png'))
         else:
+            self.supporter[i].append(None)
             print('No Supporter')

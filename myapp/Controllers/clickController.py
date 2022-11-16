@@ -6,19 +6,12 @@ import ctypes
 
 sys.path.append('..')
 
-from Models.clickModel import Model
-from Views.view import View
+from Models.clickModel import clickModel
 
-class Controller:
+class clickController:
     def __init__(self):
-        self.model = Model()
-        self.view = View(self)
+        self.model = clickModel()
         self.thread_start = 'No'
-        
-
-
-    def main(self):
-        self.view.main()
 
     
     def _async_raise(self, tid, exctype):
@@ -37,22 +30,16 @@ class Controller:
         self._async_raise(thread.ident, SystemExit)
 
 
-    def on_button_click(self, text, func):
+    def on_button_click(self, text, func, now_status_support=None, now_status_skill=None, time = None):
         result = None
-        if func == 'get_hwnd':
+        if func == 'start':
             result = self.model.get_window()
-            self.view.get_hwnd.set(result)
-        elif func == 'Times':
-            result = self.model.times_counter(text)
-            self.view.times.set(result)
-        elif func == 'start':
-            result = self.model.get_window()
-            self.view.get_hwnd.set(result)
+            print('clickController', now_status_support, now_status_skill)
             # self.model.runScrip()
             # thread_start = threading.Thread(target=self.model.runScrip, )
             # thread_start.start()
             if self.thread_start == 'No':
-                self.thread_start = threading.Thread(target=self.start, )
+                self.thread_start = threading.Thread(target=self.start, args = (now_status_support, now_status_skill, time))
                 self.thread_start.start()
         elif func == 'end':
             if self.thread_start == 'No':
@@ -61,37 +48,13 @@ class Controller:
                 self.stop_thread(self.thread_start)
                 print(self.thread_start)
                 self.thread_start = 'No'
-            
-        elif func == 'Save':
-            self.model.write_history(text)
-            self.view.get_history_title()
 
         print(result)
+        # return result
     
-    def start(self):
-        self.model.runScrip()
-    
-
-    def on_checkbutton_click(self, text, func, check):
-        if func == 'clothes':
-            result = self.model.use_clothes(text, check)
-        
-
-        print(result)
-
-    
-    def on_combobox_click(self, title, func, player, skill):
-        if func == 'battle1' or func == 'battle2' or func == 'battle3':
-            result = self.model.battle(title, func, player, skill)
-        elif func == 'read_history':
-            result = self.model.read_history(title) 
-        elif func == 'support':
-            result = self.model.support(title)
-        print(result)
-
-
-    def on_times(self, times):
-        self.model.times
-        self.view.times.set(times)
+    def start(self, now_status_support, now_status_skill, time):
+        for i in range(time):
+            print('now is times:', i)
+            self.model.runScrip(now_status_support, now_status_skill)
         
     
