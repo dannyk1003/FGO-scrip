@@ -29,11 +29,15 @@ class View:
         self.root.title('FGO Scrip')
         self.root.geometry('1000x800')
         
+        self.layout()
         
-
 
     def main(self):
-        
+
+        self.root.mainloop()
+
+
+    def layout(self):
         self._make_label('Start&End', 0, 0)
         self._make_button('get hwnd', 'get_hwnd', 1, 0)
         self._make_get_hwnd_label(1, 1)
@@ -54,14 +58,12 @@ class View:
         self._battle_area('Battle3', 'battle3', 20)
 
         self._make_label('Remember', 27, 0)
-        self._make_entry_withButton('Save', 28, 0)
+        self._make_Save_area(28, 0)
         self._make_combobox(self.history_title, 'read_history', 29, 0)
 
         self._make_label('Now Status', 30, 0)
         self._make_now_status_support_label(31, 0)
         self._make_now_status_skill_label(32, 0)
-
-        self.root.mainloop()
 
 
     def _make_main_frame(self):
@@ -79,17 +81,20 @@ class View:
         def button_event():
             print(func)
             if func == 'get_hwnd':
-                self.get_hwnd.set(self.statusController.on_button_click(text, func))
+                # self.get_hwnd.set(self.statusController.on_button_click(text, func))
+                self.get_hwnd.set(self.statusController.get_hwnd())
             elif func == 'Times':
-                self.times.set(self.statusController.on_button_click(text, func))
-                self.time = self.statusController.on_button_click(text, func)
+                # self.time = self.statusController.on_button_click(text, func)
+                self.time = self.statusController.Times(text)
+                self.times.set(self.time)
             elif func == 'Save':
                 self.get_history_title()
             elif func == 'start':
-                self.clickController.on_button_click(text, func, self.support, self.skill, self.time)
+                # self.clickController.on_button_click(text, func, self.support, self.skill, self.time)
+                self.clickController.start(self.support, self.skill, self.time)
             elif func == 'end':
-                self.clickController.on_button_click(text, func)
-            
+                # self.clickController.on_button_click(text, func)
+                self.clickController.end()
             
 
         button_Text = tk.StringVar()
@@ -143,13 +148,17 @@ class View:
         def combobox_func(event):
             title = combobox.get()
             if func == 'battle1' or func == 'battle2' or func == 'battle3':
-                self.now_status_skill.set(self.statusController.on_combobox_click(title, func, player, skill))
-                self.skill = self.statusController.on_combobox_click(title, func, player, skill)
+                # self.skill = self.statusController.on_combobox_click(title, func, player, skill)
+                self.skill = self.statusController.battle(title, func, player, skill)
+                self.now_status_skill.set(self.skill)
+
             elif func == 'read_history':
-                self.now_status_support.set(self.statusController.on_combobox_click(title, func, player, skill)[0])
-                self.support = self.statusController.on_combobox_click(title, func, player, skill)[0]
-                self.now_status_skill.set(self.statusController.on_combobox_click(title, func, player, skill)[1])
-                self.skill = self.statusController.on_combobox_click(title, func, player, skill)[1]
+                # self.support = self.statusController.on_combobox_click(title, func, player, skill)[0]
+                # self.skill = self.statusController.on_combobox_click(title, func, player, skill)[1]
+                self.support = self.statusController.read_history(title)[0]
+                self.skill = self.statusController.read_history(title)[1]
+                self.now_status_support.set(self.support)
+                self.now_status_skill.set(self.skill)
 
 
         combobox = ttk.Combobox(self.root, state='readonly')
@@ -170,8 +179,9 @@ class View:
             
         def supporter_func(event):
             supporter = combobox_supporter.get()
-            self.now_status_support.set(self.statusController.on_combobox_click([combobox_type.get(), supporter], func, None, None))
-            self.support = self.statusController.on_combobox_click([combobox_type.get(), supporter], func, None, None)
+            # self.support = self.statusController.on_combobox_click([combobox_type.get(), supporter], func, None, None)
+            self.support = self.statusController.support([combobox_type.get(), supporter])
+            self.now_status_support.set(self.support)
 
         combobox_type = ttk.Combobox(self.root, state='readonly')
         combobox_type['values'] = self.support_type
@@ -183,7 +193,6 @@ class View:
         combobox_supporter.bind("<<ComboboxSelected>>", supporter_func)
         
         
-
     def _battle_area(self, text, func, x):
         c = 'clothes'
         p1 = 'player1'
@@ -221,12 +230,13 @@ class View:
         self._make_combobox(to_who, func, x+6, 3, p3, s3)        
 
 
-    def _make_entry_withButton(self, func, x, y):
+    def _make_Save_area(self, x, y):
 
         def button_event():
             if entry_text.get() != '':
                 text = entry_text.get()
-                self.statusController.on_button_click(text, func)
+                # self.statusController.on_button_click(text, func)
+                self.statusController.Save(text)
 
         entry_text = tk.StringVar()
         entry = tk.Entry(self.root, textvariable=entry_text)

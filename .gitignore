@@ -12,4 +12,5 @@ pip-selfcheck.json
 *.png
 __pycache__/
 Test/
+share/
 *.json
