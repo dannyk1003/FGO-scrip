@@ -2,15 +2,17 @@
 import tkinter as tk
 from tkinter import ttk
 import os
-
 import sys
-sys.path.append('..')
+
+# sys.path.append('..')
 # from Controllers.clickController import clickController
 # from Controllers.statusController import statusController
 
 
 class View:
     def __init__(self, statusController, clickController):
+        self.path = sys.path[0]
+
         self.statusController = statusController
         self.clickController = clickController
         self.root = tk.Tk()
@@ -31,9 +33,9 @@ class View:
         
         self.layout()
         
+        
 
     def main(self):
-
         self.root.mainloop()
 
 
@@ -248,8 +250,8 @@ class View:
 
     def get_history_title(self):
         self.history_title = list()
-        if os.path.isdir(r'.\history\battleSkill'):
-            title = os.listdir(r'.\history\battleSkill')
+        if os.path.isdir(rf'{self.path}\history\battleSkill'):
+            title = os.listdir(rf'{self.path}\history\battleSkill')
             for i in title:
                 self.history_title.append(i.rstrip('.json'))
         else:
@@ -261,11 +263,12 @@ class View:
         self.support_type = ['all', 'saber', 'archer', 'lancer', 'rider', 'caster', 'assassin', 'berserker', 'other', 'mix']
         self.supporter = {'all': list(), 'saber': list(), 'archer': list(), 'lancer': list(), 'rider': list(), 'caster': list(), 'assassin': list(), 'berserker': list(), 'other': list(), 'mix': list()}
         # title = os.listdir(rf'.\img\Support\{type}')
-        if os.path.isdir('.\img\Support'):
+        if os.path.isdir(rf'{self.path}\img\Support'):
             for i in self.support_type:
-                title = os.listdir(rf'.\img\Support\{i}')
+                title = os.listdir(rf'{self.path}\img\Support\{i}')
                 for j in title:
                     self.supporter[i].append(j.rstrip('.png'))
         else:
-            self.supporter[i].append(None)
+            for i in self.support_type:
+                self.supporter[i].append(None)
             print('No Supporter')

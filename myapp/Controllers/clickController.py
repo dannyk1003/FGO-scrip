@@ -4,7 +4,7 @@ import threading
 import inspect
 import ctypes
 
-sys.path.append('..')
+# sys.path.append('..')
 
 from Models.clickModel import clickModel
 

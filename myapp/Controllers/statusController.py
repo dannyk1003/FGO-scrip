@@ -1,13 +1,14 @@
 # 點擊流程
 import sys
 
-sys.path.append('..')
+# sys.path.append('..')
 
 from Models.statusModel import statusModel
 
 class statusController:
     def __init__(self):
         self.model = statusModel()
+        self.path = sys.path[0]
 
 
     def get_hwnd(self):

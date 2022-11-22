@@ -1,9 +1,12 @@
 # 紀錄狀態
 import win32api, win32gui, win32con, win32com.client
 import json
+import sys
 
 class statusModel:
     def __init__(self):
+        self.path = sys.path[0]
+
         self.times = 0
         self.window = 'BlueStacks App Player'
         self.innerWindow = 'Qt5154QWindowIcon'
@@ -83,16 +86,16 @@ class statusModel:
 
 
     def write_history(self, title):
-        with open(rf'history\battleSkill\{title}.json','w') as fw:
+        with open(rf'{self.path}\history\battleSkill\{title}.json','w') as fw:
             json.dump(self.battleSkill,fw)
-        with open(rf'history\Support\{title}.json','w') as fw:
+        with open(rf'{self.path}\history\Support\{title}.json','w') as fw:
             json.dump(self.supporter,fw)
     
 
     def read_history(self, text):
-        with open(rf'history\battleSkill\{text}.json','r') as fr:
+        with open(rf'{self.path}\history\battleSkill\{text}.json','r') as fr:
             self.battleSkill = json.load(fr)
-        with open(rf'history\Support\{text}.json','r') as fr:
+        with open(rf'{self.path}\history\Support\{text}.json','r') as fr:
             self.supporter = json.load(fr)
         print(self.supporter, self.battleSkill)
         return [self.supporter, self.battleSkill]

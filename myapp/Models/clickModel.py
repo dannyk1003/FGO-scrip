@@ -8,16 +8,20 @@ from PyQt5.QtWidgets import QApplication
 import sys
 import cv2
 import pythoncom
+# from Models.Visual import Visual
 
 
 class clickModel:
     def __init__(self):
+        self.path = sys.path[0]
+
         self.times = 0
         self.window = 'BlueStacks App Player'
         self.innerWindow = 'Qt5154QWindowIcon'
         self.hwnd = ''
         self.innerHwnd = ''
         self.connect = ''
+        
 
         self.battleSkill = {'b1p0s1': None, 'b1p1s1': None, 'b1p2s1': None, 'b1p3s1': None, 
                             'b1p0s2': None, 'b1p1s2': None, 'b1p2s2': None, 'b1p3s2': None, 
@@ -52,6 +56,7 @@ class clickModel:
 
             self.innerHwnd = get_inner_windows(self.hwnd)[self.innerWindow]
             print(self.hwnd, self.innerHwnd)
+            
             self.connect = 'Success'
             self.position()
         
@@ -231,44 +236,6 @@ class clickModel:
         
         time.sleep(20)
 
-
-    def SizeTest(self, text):
-        img = Image.open(rf'img\screenShot\{text}.png')
-        return img.size
-
-
-    def get_image(self, text):
-        app = QApplication(sys.argv)
-        screen = QApplication.primaryScreen()
-        img = screen.grabWindow(self.innerHwnd).toImage()
-        img.save(rf'img\screenShot\{text}.png')
-
-        return rf'img\screenShot\{text}.png'
-
-
-    def get_900_506_image(self, text):
-        self.get_image(text)
-        while True:
-            if self.SizeTest(text) != (900, 506):
-                win32gui.MoveWindow(self.hwnd, True, True, 934, 540, True)
-                time.sleep(0.5)
-                self.get_image(text)
-            else:
-                break
-        return rf'img\screenShot\{text}.png'
-
-    
-    def locateOnImage(self, item, image):
-
-        self.get_900_506_image(image)
-        if pyautogui.locate(rf'img\{item}.png', rf'img\screenShot\{image}.png', confidence=0.95) != None:
-            # x = pyautogui.locate(rf'img\{item}.png', rf'img\screenShot\{image}.png', confidence=0.95)[0]
-            # y = pyautogui.locate(rf'img\{item}.png', rf'img\screenShot\{image}.png', confidence=0.95)[1]
-            x, y = pyautogui.center(pyautogui.locate(rf'img\{item}.png', rf'img\screenShot\{image}.png', confidence=0.95))
-            return [x, y]
-        else:
-            return None
-
     
     def CheckBattleCount(self, count):
         # win32gui.MoveWindow(self.hwnd, True, True, 960, 540, True)
@@ -276,9 +243,9 @@ class clickModel:
 
         # Now = self.get_image('Now')
         Now = self.get_900_506_image('Now')
-        Now_cut = rf'img\screenShot\Now_cut_{count}.png'
-        Now_cut_black = rf'img\screenShot\Now_cut_{count}_black.png'
-        BattleCount = rf'img\BattleCount\Battle{count}.png'
+        Now_cut = rf'{self.path}\img\screenShot\Now_cut_{count}.png'
+        Now_cut_black = rf'{self.path}\img\screenShot\Now_cut_{count}_black.png'
+        BattleCount = rf'{self.path}\img\BattleCount\Battle{count}.png'
         self.image_cut(Now, Now_cut, 620, 0, 633, 30)
         self.WordToBlack(Now_cut, Now_cut_black)
 
@@ -290,35 +257,11 @@ class clickModel:
         else:
             return None
         
-    
-    def WordToBlack(self, before, after):
-        img = cv2.imread(before)
-
-        imgToBlack = np.array(img)
-        for i in range(len(img)):
-            for j in range(len(img[i])):
-                if (img[i][j][0] == img[i][j][1]) & (img[i][j][1] == img[i][j][2]) & (img[i][j][0] >= 80):
-                    imgToBlack[i][j][0] = 0
-                    imgToBlack[i][j][1] = 0
-                    imgToBlack[i][j][2] = 0
-                else:
-                    imgToBlack[i][j][0] = 255
-                    imgToBlack[i][j][1] = 255
-                    imgToBlack[i][j][2] = 255
-
-        cv2.imwrite(after, imgToBlack)
-
-
-    def image_cut(self, before, after, x_start, y_start, x_end, y_end): # 620, 0, 633, 30 這個位置是battle幾
-        img = Image.open(before)
-        new_img = img.crop((x_start, y_start, x_end, y_end))  # (left, upper, right, lower)
-        new_img.save(after)
-
 
     def skill_used_check(self):
         # Now = self.get_image('Now')
         Now = self.get_900_506_image('Now')
-        cancel = rf'img\cancel.png'
+        cancel = rf'{self.path}\img\cancel.png'
         if pyautogui.locate(cancel, Now, confidence=0.8) != None :
             print(pyautogui.locate(cancel, Now, confidence=0.8))
             x = pyautogui.locate(cancel, Now, confidence=0.8)[0]
@@ -412,3 +355,71 @@ class clickModel:
                     go_down_position = self.locateOnImage(rf"\AP_Recovery\go_down", 'ScreenShot')
                     self.doClick(go_down_position)
                     time.sleep(1)
+
+
+'''
+
+    def WordToBlack(self, before, after):
+        img = cv2.imread(before)
+
+        imgToBlack = np.array(img)
+        for i in range(len(img)):
+            for j in range(len(img[i])):
+                if (img[i][j][0] == img[i][j][1]) & (img[i][j][1] == img[i][j][2]) & (img[i][j][0] >= 80):
+                    imgToBlack[i][j][0] = 0
+                    imgToBlack[i][j][1] = 0
+                    imgToBlack[i][j][2] = 0
+                else:
+                    imgToBlack[i][j][0] = 255
+                    imgToBlack[i][j][1] = 255
+                    imgToBlack[i][j][2] = 255
+
+        cv2.imwrite(after, imgToBlack)
+
+
+    def image_cut(self, before, after, x_start, y_start, x_end, y_end): # 620, 0, 633, 30 這個位置是battle幾
+        img = Image.open(before)
+        new_img = img.crop((x_start, y_start, x_end, y_end))  # (left, upper, right, lower)
+        new_img.save(after)
+
+
+    def SizeTest(self, text):
+        img = Image.open(rf'{self.path}\img\screenShot\{text}.png')
+        # img = self.screenShot
+        return img.size
+
+
+    def get_image(self, text):
+        app = QApplication(sys.argv)
+        screen = QApplication.primaryScreen()
+        img = screen.grabWindow(self.innerHwnd).toImage()
+        img.save(rf'{self.path}\img\screenShot\{text}.png')
+        # self.screenShot = ImageQt.fromqimage(img)
+
+        return rf'{self.path}\img\screenShot\{text}.png'
+
+
+    def get_900_506_image(self, text):
+        self.get_image(text)
+        while True:
+            if self.SizeTest(text) != (900, 506):
+                win32gui.MoveWindow(self.hwnd, True, True, 934, 540, True)
+                time.sleep(0.5)
+                self.get_image(text)
+            else:
+                break
+        return rf'{self.path}\img\screenShot\{text}.png'
+
+    
+    def locateOnImage(self, item, image):
+
+        self.get_900_506_image(image)
+        if pyautogui.locate(rf'{self.path}\img\{item}.png', rf'{self.path}\img\screenShot\{image}.png', confidence=0.95) != None:
+            # x = pyautogui.locate(rf'img\{item}.png', rf'img\screenShot\{image}.png', confidence=0.95)[0]
+            # y = pyautogui.locate(rf'img\{item}.png', rf'img\screenShot\{image}.png', confidence=0.95)[1]
+            x, y = pyautogui.center(pyautogui.locate(rf'{self.path}\img\{item}.png', rf'{self.path}\img\screenShot\{image}.png', confidence=0.95))
+            return [x, y]
+        else:
+            return None
+
+'''
