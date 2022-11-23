@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QApplication
 import sys
 import cv2
 import pythoncom
-# from Models.Visual import Visual
+from Models.Visual import Visual
 
 
 class clickModel:
@@ -56,7 +56,9 @@ class clickModel:
 
             self.innerHwnd = get_inner_windows(self.hwnd)[self.innerWindow]
             print(self.hwnd, self.innerHwnd)
-            
+
+            self.Visual = Visual(self.hwnd, self.innerHwnd)
+
             self.connect = 'Success'
             self.position()
         
@@ -170,7 +172,10 @@ class clickModel:
                     self.useAttack()
                     self.main_screen()
                     battle_count_position = self.CheckBattleCount(n)
-                    with_servent_connect_position = self.locateOnImage('with_servent_connect', 'FGO_ScreenShot')
+                    # with_servent_connect_position = self.locateOnImage('with_servent_connect', 'FGO_ScreenShot')
+
+                    with_servent_connect_position = self.Visual.locateOnImage('with_servent_connect')
+
                     if battle_count_position == None:
                         break
                     elif with_servent_connect_position != None:
@@ -182,8 +187,10 @@ class clickModel:
 
 
     def main_screen(self):
-        clothes_position = self.locateOnImage('clothes', 'ScreenShot')
-        with_servent_connect_position = self.locateOnImage('with_servent_connect', 'FGO_ScreenShot')
+        # clothes_position = self.locateOnImage('clothes', 'ScreenShot')
+        # with_servent_connect_position = self.locateOnImage('with_servent_connect', 'FGO_ScreenShot')
+        clothes_position = self.Visual.locateOnImage('clothes')
+        with_servent_connect_position = self.Visual.locateOnImage('with_servent_connect')
 
         while True:
             if clothes_position != None:
@@ -192,8 +199,10 @@ class clickModel:
                 break
             else:
                 time.sleep(5)
-                clothes_position = self.locateOnImage('clothes', 'ScreenShot')
-                with_servent_connect_position = self.locateOnImage('with_servent_connect', 'FGO_ScreenShot')
+                # clothes_position = self.locateOnImage('clothes', 'ScreenShot')
+                # with_servent_connect_position = self.locateOnImage('with_servent_connect', 'FGO_ScreenShot')
+                clothes_position = self.Visual.locateOnImage('clothes')
+                with_servent_connect_position = self.Visual.locateOnImage('with_servent_connect')
 
 
     def useSkill(self, p, n, m): # player p 的第n個技能, 給player m
@@ -215,7 +224,8 @@ class clickModel:
                     self.doClick(self.clothes)
                     time.sleep(1)
             else:
-                img = self.locateOnImage('Please_select_object', 'FGO_ScreenShot')
+                # img = self.locateOnImage('Please_select_object', 'FGO_ScreenShot')
+                img = self.Visual.locateOnImage('Please_select_object')
                 if img != None:
                     self.doClick(self.toPlayer[m])
                 time.sleep(4)
@@ -242,12 +252,18 @@ class clickModel:
         # time.sleep(0.5)
 
         # Now = self.get_image('Now')
-        Now = self.get_900_506_image('Now')
-        Now_cut = rf'{self.path}\img\screenShot\Now_cut_{count}.png'
-        Now_cut_black = rf'{self.path}\img\screenShot\Now_cut_{count}_black.png'
+        # Now = self.get_900_506_image('Now')
+        # Now_cut = rf'{self.path}\img\screenShot\Now_cut_{count}.png'
+        # Now_cut_black = rf'{self.path}\img\screenShot\Now_cut_{count}_black.png'
+        # BattleCount = rf'{self.path}\img\BattleCount\Battle{count}.png'
+        # self.image_cut(Now, Now_cut, 620, 0, 633, 30)
+        # self.WordToBlack(Now_cut, Now_cut_black)
+
+        Now = self.Visual.get_900_506_image()
+        Now_cut = self.Visual.image_cut(Now, 620, 0, 633, 30)
+        Now_cut_black = self.Visual.WordToBlack(Now_cut)
         BattleCount = rf'{self.path}\img\BattleCount\Battle{count}.png'
-        self.image_cut(Now, Now_cut, 620, 0, 633, 30)
-        self.WordToBlack(Now_cut, Now_cut_black)
+
 
         if pyautogui.locate(Now_cut_black, BattleCount, confidence=0.8) != None :
 
@@ -260,8 +276,12 @@ class clickModel:
 
     def skill_used_check(self):
         # Now = self.get_image('Now')
-        Now = self.get_900_506_image('Now')
+        # Now = self.get_900_506_image('Now')
+        # cancel = rf'{self.path}\img\cancel.png'
+
+        Now = self.Visual.get_900_506_image()
         cancel = rf'{self.path}\img\cancel.png'
+
         if pyautogui.locate(cancel, Now, confidence=0.8) != None :
             print(pyautogui.locate(cancel, Now, confidence=0.8))
             x = pyautogui.locate(cancel, Now, confidence=0.8)[0]
@@ -274,14 +294,23 @@ class clickModel:
     def select_support(self):
         while True:
             time.sleep(2)
-            support_choose_position = self.locateOnImage(rf"\Support\support_choose", 'ScreenShot')
+            # support_choose_position = self.locateOnImage(rf"\Support\support_choose", 'ScreenShot')
+
+            support_choose_position = self.Visual.locateOnImage(rf"\Support\support_choose")
+
             if support_choose_position != None:
                 break
 
-        support_type_location = self.locateOnImage(rf"\Support\{self.supporter['type']}", 'ScreenShot')
+        # support_type_location = self.locateOnImage(rf"\Support\{self.supporter['type']}", 'ScreenShot')
+            
+        support_type_location = self.Visual.locateOnImage(rf"\Support\{self.supporter['type']}")
+
         self.doClick(support_type_location)
 
-        supporter_location = self.locateOnImage(rf"\Support\{self.supporter['type']}\{self.supporter['supporter']}", 'ScreenShot')
+        # supporter_location = self.locateOnImage(rf"\Support\{self.supporter['type']}\{self.supporter['supporter']}", 'ScreenShot')
+
+        supporter_location = self.Visual.locateOnImage(rf"\Support\{self.supporter['type']}\{self.supporter['supporter']}")
+
         print(supporter_location)
 
         if supporter_location != None:
@@ -291,12 +320,21 @@ class clickModel:
             i = 0
             while i != 10:
                 i += 1
-                go_down_location = self.locateOnImage(rf"\Support\go_down", 'ScreenShot')
+                # go_down_location = self.locateOnImage(rf"\Support\go_down", 'ScreenShot')
+
+                go_down_location = self.Visual.locateOnImage(rf"\Support\go_down")
+
                 if go_down_location == None:
-                    re_new_list_location = self.locateOnImage(rf"\Support\re_new_list", 'ScreenShot')
+                    # re_new_list_location = self.locateOnImage(rf"\Support\re_new_list", 'ScreenShot')
+
+                    re_new_list_location = self.Visual.locateOnImage(rf"\Support\re_new_list")
+
                     self.doClick(re_new_list_location)
                     time.sleep(1)
-                    yes_location = self.locateOnImage(rf"\Support\yes", 'ScreenShot')
+                    # yes_location = self.locateOnImage(rf"\Support\yes", 'ScreenShot')
+
+                    yes_location = self.Visual.locateOnImage(rf"\Support\yes")
+
                     self.doClick(yes_location)
                     time.sleep(1)
                     i = 0
@@ -304,30 +342,48 @@ class clickModel:
                     self.doClick(go_down_location)
                     time.sleep(1)
                 
-                supporter_location = self.locateOnImage(rf"\Support\{self.supporter['type']}\{self.supporter['supporter']}", 'ScreenShot')
+                # supporter_location = self.locateOnImage(rf"\Support\{self.supporter['type']}\{self.supporter['supporter']}", 'ScreenShot')
+
+                supporter_location = self.Visual.locateOnImage(rf"\Support\{self.supporter['type']}\{self.supporter['supporter']}")
 
                 if supporter_location != None:
                     time.sleep(1)
                     self.doClick(supporter_location)
                     break
         time.sleep(1)
-        mission_start_position = self.locateOnImage(rf"\Support\mission_start", 'ScreenShot')
-        if mission_start_position != None:
-            self.doClick(mission_start_position)
+        # mission_start_position = self.locateOnImage(rf"\Support\mission_start", 'ScreenShot')
+
+        mission_start_position = self.Visual.locateOnImage(rf"\Support\mission_start")
+
+        while True:
+
+            if mission_start_position != None:
+                self.doClick(mission_start_position)
+                break
+            else:
+                time.sleep(0.5)
+                mission_start_position = self.Visual.locateOnImage(rf"\Support\mission_start")
         
         print('select end')
 
 
     def go_again(self):
         while True:
-            go_again_position = self.locateOnImage(rf"go_again", 'ScreenShot')
-            close_position = self.locateOnImage(rf"close", 'ScreenShot')
+            # go_again_position = self.locateOnImage(rf"go_again", 'ScreenShot')
+            # close_position = self.locateOnImage(rf"close", 'ScreenShot')
+
+            go_again_position = self.Visual.locateOnImage(rf"go_again")
+            close_position = self.Visual.locateOnImage(rf"close")
+
             if go_again_position == None:
                 if close_position == None:
                     self.doClick(self.next)
                     time.sleep(0.5)
                 else:
-                    last_time_position = self.locateOnImage(rf"last_time", 'ScreenShot')
+                    # last_time_position = self.locateOnImage(rf"last_time", 'ScreenShot')
+
+                    last_time_position = self.Visual.locateOnImage(rf"last_time")
+
                     if last_time_position == None:
                         self.doClick(self.mission)
                         break
@@ -341,18 +397,30 @@ class clickModel:
 
     def AP_recovery(self):
         self.apple = 'bronze'
-        gold_position = self.locateOnImage(rf"\AP_Recovery\gold", 'ScreenShot')
+        # gold_position = self.locateOnImage(rf"\AP_Recovery\gold", 'ScreenShot')
+
+        gold_position = self.Visual.locateOnImage(rf"\AP_Recovery\gold")
+
         if gold_position != None:
             while True:
-                apple_position = self.locateOnImage(rf"\AP_Recovery\{self.apple}", 'ScreenShot')
+                # apple_position = self.locateOnImage(rf"\AP_Recovery\{self.apple}", 'ScreenShot')
+
+                apple_position = self.Visual.locateOnImage(rf"\AP_Recovery\{self.apple}")
+
                 if apple_position != None:
                     self.doClick(apple_position)
                     time.sleep(1)
-                    sure_position = self.locateOnImage(rf"\AP_Recovery\sure", 'ScreenShot')
+                    # sure_position = self.locateOnImage(rf"\AP_Recovery\sure", 'ScreenShot')
+
+                    sure_position = self.Visual.locateOnImage(rf"\AP_Recovery\sure")
+
                     self.doClick(sure_position)
                     break
                 else:
-                    go_down_position = self.locateOnImage(rf"\AP_Recovery\go_down", 'ScreenShot')
+                    # go_down_position = self.locateOnImage(rf"\AP_Recovery\go_down", 'ScreenShot')
+
+                    go_down_position = self.Visual.locateOnImage(rf"\AP_Recovery\go_down")
+
                     self.doClick(go_down_position)
                     time.sleep(1)
 
