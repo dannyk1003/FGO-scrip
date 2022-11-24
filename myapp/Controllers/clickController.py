@@ -39,18 +39,19 @@ class clickController:
 
 
     def end(self):
-            if self.thread_start == 'No':
-                print('No Thread')
-            else:
-                self.stop_thread(self.thread_start)
-                print(self.thread_start)
-                self.thread_start = 'No'
+        if self.thread_start == 'No':
+            print('No Thread')
+        else:
+            self.stop_thread(self.thread_start)
+            print(self.thread_start)
+            self.thread_start = 'No'
 
     
     def runScrip(self, now_status_support, now_status_skill, time):
         for i in range(time):
             print('now is times:', i)
             self.model.runScrip(now_status_support, now_status_skill)
+        self.thread_start = 'No'
         
     
 

@@ -15,11 +15,12 @@ class Visual:
         self.path = sys.path[0]
         self.hwnd = hwnd
         self.innerHwnd = innerHwnd
+        self.app = QApplication(sys.argv)
 
 
     def get_image(self):
-        app = QApplication(sys.argv)
-        screen = QApplication.primaryScreen()
+        print('get_image')
+        screen = self.app.primaryScreen()
         img = screen.grabWindow(self.innerHwnd).toImage()
         # print(type(img))
         # print(img)

@@ -3,6 +3,8 @@ import tkinter as tk
 from tkinter import ttk
 import os
 import sys
+from Views.view2 import view2
+
 
 # sys.path.append('..')
 # from Controllers.clickController import clickController
@@ -25,6 +27,7 @@ class View:
         self.support = ''
         self.skill = ''
         self.time = 0
+        self.view2open = False
         self.get_history_title()
         self.get_support_title()
 
@@ -54,6 +57,8 @@ class View:
         self._make_button('unlimited', 'Times', 3, 5)
 
         self._support_area(4, 'support')
+
+        self._to_another_view('view2', 6, 4)
 
         self._battle_area('Battle1', 'battle1', 6)
         self._battle_area('Battle2', 'battle2', 13)
@@ -103,6 +108,21 @@ class View:
         button = ttk.Button(self.root, text=button_Text, command=button_event)
         button['text'] = text
         button.grid(row=x, column=y)
+
+    
+    def _to_another_view(self, text, x, y):
+        def button_event():
+            if self.view2open == False:
+                self.view2open = True
+                view2(self)
+                print('kk')
+                
+            
+
+        button_Text = tk.StringVar()
+        button = ttk.Button(self.root, text=button_Text, command=button_event)
+        button['text'] = text
+        button.grid(row=x, column=y)  
 
 
     def _make_label(self, text, x, y):

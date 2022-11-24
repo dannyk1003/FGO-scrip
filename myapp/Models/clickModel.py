@@ -3,11 +3,9 @@ import win32api, win32gui, win32con, win32com.client
 import numpy as np
 import time
 import pyautogui
-from PIL import Image, ImageQt
-from PyQt5.QtWidgets import QApplication
 import sys
-import cv2
 import pythoncom
+import json
 from Models.Visual import Visual
 
 
@@ -57,7 +55,6 @@ class clickModel:
             self.innerHwnd = get_inner_windows(self.hwnd)[self.innerWindow]
             print(self.hwnd, self.innerHwnd)
 
-            self.Visual = Visual(self.hwnd, self.innerHwnd)
 
             self.connect = 'Success'
             self.position()
@@ -66,6 +63,7 @@ class clickModel:
 
 
     def doClick(self, position):
+        print('click')
         x = position[0]
         y = position[1]
         hwnd = self.innerHwnd
@@ -83,12 +81,26 @@ class clickModel:
         shell.SendKeys('%')
         win32gui.SetForegroundWindow(self.hwnd)
 
+    
+    def status_init(self, now_status_support, now_status_skill):
+        if now_status_support != '':
+            self.supporter = now_status_support
+        else:
+            with open(rf'{self.path}\Configs\supporter_init.json','r') as fr:
+                self.supporter = json.load(fr)
+                
+        if now_status_skill != '':
+            self.battleSkill = now_status_skill
+        else:
+            with open(rf'{self.path}\Configs\battleSkill_init.json','r') as fr:
+                self.battleSkill = json.load(fr)
+
 
     def runScrip(self, now_status_support, now_status_skill):
+        self.Visual = Visual(self.hwnd, self.innerHwnd)
         pythoncom.CoInitialize()
-        self.supporter = now_status_support
-        self.battleSkill = now_status_skill
-        self.times = 1
+        
+        self.status_init(now_status_support, now_status_skill)
 
         # while True:
         #     time.sleep(1)
@@ -210,8 +222,16 @@ class clickModel:
             player = 'p' + str(p) + 's' + str(n)
             print(player)
             if p == 0:
-                self.doClick(self.clothes)
-                time.sleep(1)
+                clothes_position = self.Visual.locateOnImage('clothes')
+                while True:
+                    if clothes_position != None:
+                        time.sleep(0.5)
+                        self.doClick(self.clothes)
+                        time.sleep(1)
+                        break
+                    else:
+                        time.sleep(0.5)
+                        clothes_position = self.Visual.locateOnImage('clothes')
             
             self.doClick(self.playerSkill[player])
             time.sleep(4)
@@ -354,15 +374,19 @@ class clickModel:
         # mission_start_position = self.locateOnImage(rf"\Support\mission_start", 'ScreenShot')
 
         mission_start_position = self.Visual.locateOnImage(rf"\Support\mission_start")
+        clothes_position = self.Visual.locateOnImage('clothes')
 
         while True:
 
             if mission_start_position != None:
                 self.doClick(mission_start_position)
                 break
+            elif clothes_position != None:
+                break
             else:
                 time.sleep(0.5)
                 mission_start_position = self.Visual.locateOnImage(rf"\Support\mission_start")
+                clothes_position = self.Visual.locateOnImage('clothes')
         
         print('select end')
 
