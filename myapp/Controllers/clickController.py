@@ -48,9 +48,11 @@ class clickController:
 
     
     def runScrip(self, now_status_support, now_status_skill, time):
+        self.model.status_init(now_status_support, now_status_skill)
+
         for i in range(time):
             print('now is times:', i)
-            self.model.runScrip(now_status_support, now_status_skill)
+            self.model.runScrip()
         self.thread_start = 'No'
         
     

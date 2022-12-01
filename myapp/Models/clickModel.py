@@ -83,6 +83,7 @@ class clickModel:
 
     
     def status_init(self, now_status_support, now_status_skill):
+        self.Visual = Visual(self.hwnd, self.innerHwnd)
         if now_status_support != '':
             self.supporter = now_status_support
         else:
@@ -96,11 +97,11 @@ class clickModel:
                 self.battleSkill = json.load(fr)
 
 
-    def runScrip(self, now_status_support, now_status_skill):
-        self.Visual = Visual(self.hwnd, self.innerHwnd)
+    def runScrip(self):
+    
         pythoncom.CoInitialize()
         
-        self.status_init(now_status_support, now_status_skill)
+        # self.status_init(now_status_support, now_status_skill)
 
         # while True:
         #     time.sleep(1)

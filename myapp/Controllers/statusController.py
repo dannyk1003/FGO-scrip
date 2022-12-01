@@ -1,4 +1,4 @@
-# 點擊流程
+# 狀態流程
 import sys
 
 # sys.path.append('..')

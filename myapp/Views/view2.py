@@ -8,17 +8,67 @@ class view2:
         self.view = view
         self.root = tk.Tk()
         self.root.title('Battle Skill')
-        self.root.protocol('WM_DELETE_WINDOW', self.print)
+        self.root.protocol('WM_DELETE_WINDOW', self.exit)
         self.view2open = True
 
-        self._battle_area('Battle1', 'battle1', 0)
-        self._battle_area('Battle2', 'battle2', 7)
-        self._battle_area('Battle3', 'battle3', 14)
-    
+        self._support_area(0, 'support')
+        self._make_label('Select your Battle Skill', 3, 0)
+        self._battle_area('Battle1', 'battle1', 4)
+        self._battle_area('Battle2', 'battle2', 11)
+        self._battle_area('Battle3', 'battle3', 18)
+        
+        self._make_Save_area(25, 0)
+        
         
     def main(self):
         self.root.mainloop()
-        print('delete')
+        print('view 2 end')
+
+    def _make_Save_area(self, x, y):
+        self._make_label('Remember me', x, 0)
+        def button_event():
+            print('func')
+            print(entry.get())
+            print(entry)
+            if entry.get() != '':
+                text = entry.get()
+                # self.statusController.on_button_click(text, func)
+                print(text)
+                self.view.statusController.Save(text)
+
+        entry = tk.Entry(self.root)
+        entry.grid(row=x+1, column=y)
+
+        myButton = tk.Button(self.root, text = 'Save', command=button_event)
+        myButton.grid(row=x+1, column=y+1)
+
+    
+    def _support_area(self, x, func):
+        self._make_label('Select your Support', x, 0)
+        def type_func(event):
+            support_type = combobox_type.get()
+
+            combobox_supporter['values'] = self.view.supporter[support_type]
+            combobox_supporter.current(0)
+            print(self.view.supporter[support_type])
+            
+        def supporter_func(event):
+            supporter = combobox_supporter.get()
+            # self.support = self.statusController.on_combobox_click([combobox_type.get(), supporter], func, None, None)
+            self.view.support = self.view.statusController.support([combobox_type.get(), supporter])
+            self.view.now_status_support.set(self.view.support)
+
+        combobox_type = ttk.Combobox(self.root, state='readonly')
+        combobox_type['values'] = self.view.support_type
+        combobox_type.grid(row=x+1, column=0)
+        combobox_type.current(0)
+        combobox_type.bind("<<ComboboxSelected>>", type_func)
+
+        combobox_supporter = ttk.Combobox(self.root, state='readonly')
+        combobox_supporter.grid(row=x+1, column=1)
+        combobox_supporter['values'] = self.view.supporter[combobox_type.get()]
+        combobox_supporter.current(0)
+        combobox_supporter.bind("<<ComboboxSelected>>", supporter_func)
 
 
     def _battle_area(self, text, func, x):
@@ -71,17 +121,14 @@ class view2:
         def combobox_func(event):
             title = combobox.get()
             if func == 'battle1' or func == 'battle2' or func == 'battle3':
-                # self.skill = self.statusController.on_combobox_click(title, func, player, skill)
-                self.skill = self.statusController.battle(title, func, player, skill)
-                self.now_status_skill.set(self.skill)
+                self.view.skill = self.view.statusController.battle(title, func, player, skill)
+                self.view.now_status_skill.set(self.view.skill)
 
             elif func == 'read_history':
-                # self.support = self.statusController.on_combobox_click(title, func, player, skill)[0]
-                # self.skill = self.statusController.on_combobox_click(title, func, player, skill)[1]
-                self.support = self.statusController.read_history(title)[0]
-                self.skill = self.statusController.read_history(title)[1]
-                self.now_status_support.set(self.support)
-                self.now_status_skill.set(self.skill)
+                self.view.support = self.view.statusController.read_history(title)[0]
+                self.view.skill = self.view.statusController.read_history(title)[1]
+                self.view.now_status_support.set(self.view.support)
+                self.view.now_status_skill.set(self.view.skill)
 
         combobox = ttk.Combobox(self.root, state='readonly')
         combobox['values'] = text
@@ -91,7 +138,7 @@ class view2:
         combobox.bind("<<ComboboxSelected>>", combobox_func)
 
     
-    def print(self):
+    def exit(self):
         # sys.exit(0)
         self.view.view2open = False
         self.root.destroy()

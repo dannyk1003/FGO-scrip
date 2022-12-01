@@ -4,6 +4,7 @@ from tkinter import ttk
 import os
 import sys
 from Views.view2 import view2
+from Views.view3 import view3
 
 
 # sys.path.append('..')
@@ -28,6 +29,7 @@ class View:
         self.skill = ''
         self.time = 0
         self.view2open = False
+        self.view3open = False
         self.get_history_title()
         self.get_support_title()
 
@@ -56,16 +58,16 @@ class View:
         self._make_button('+5', 'Times', 3, 4)
         self._make_button('unlimited', 'Times', 3, 5)
 
-        self._support_area(4, 'support')
+        # self._support_area(4, 'support')
 
-        self._to_another_view('view2', 6, 4)
+        self._to_another_view('Battle Information', 4, 0)
 
-        self._battle_area('Battle1', 'battle1', 6)
-        self._battle_area('Battle2', 'battle2', 13)
-        self._battle_area('Battle3', 'battle3', 20)
+        # self._battle_area('Battle1', 'battle1', 6)
+        # self._battle_area('Battle2', 'battle2', 13)
+        # self._battle_area('Battle3', 'battle3', 20)
 
-        self._make_label('Remember', 27, 0)
-        self._make_Save_area(28, 0)
+        # self._make_label('Remember', 27, 0)
+        # self._make_Save_area(28, 0)
         self._make_combobox(self.history_title, 'read_history', 29, 0)
 
         self._make_label('Now Status', 30, 0)
@@ -89,7 +91,13 @@ class View:
             print(func)
             if func == 'get_hwnd':
                 # self.get_hwnd.set(self.statusController.on_button_click(text, func))
-                self.get_hwnd.set(self.statusController.get_hwnd())
+                get_hwnd = self.statusController.get_hwnd()
+                self.get_hwnd.set(get_hwnd)
+                print(get_hwnd)
+                if get_hwnd == 'Fail':
+                    if self.view3open == False:
+                        self.view3open = True
+                        view3(self).main()
             elif func == 'Times':
                 # self.time = self.statusController.on_button_click(text, func)
                 self.time = self.statusController.Times(text)
@@ -114,7 +122,8 @@ class View:
         def button_event():
             if self.view2open == False:
                 self.view2open = True
-                view2(self)
+                # view2(self)
+                view2(self).main()
                 print('kk')
                 
             
@@ -255,8 +264,10 @@ class View:
     def _make_Save_area(self, x, y):
 
         def button_event():
+            print(entry_text.get())
             if entry_text.get() != '':
                 text = entry_text.get()
+                print(text)
                 # self.statusController.on_button_click(text, func)
                 self.statusController.Save(text)
 

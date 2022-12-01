@@ -62,7 +62,7 @@ class statusModel:
                 win32gui.EnumChildWindows(hwnd, callback, hwnds_dict)
 
                 return hwnds_dict
-
+            
             self.innerHwnd = get_inner_windows(self.hwnd)[self.innerWindow]
             print(self.hwnd, self.innerHwnd)
             self.connect = 'Success'
