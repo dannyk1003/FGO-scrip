@@ -18,6 +18,7 @@ class view2:
         self._battle_area('Battle3', 'battle3', 18)
         
         self._make_Save_area(25, 0)
+        self._make_button('Done', 26, 3)
         
         
     def main(self):
@@ -136,6 +137,18 @@ class view2:
         combobox.current(0)
 
         combobox.bind("<<ComboboxSelected>>", combobox_func)
+
+
+    def _make_button(self, text, x, y):
+
+        def button_event():
+            self.exit()
+            
+
+        button_Text = tk.StringVar()
+        button = ttk.Button(self.root, text=button_Text, command=button_event)
+        button['text'] = text
+        button.grid(row=x, column=y)
 
     
     def exit(self):

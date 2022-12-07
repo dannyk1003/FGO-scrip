@@ -7,21 +7,18 @@ from Views.view2 import view2
 from Views.view3 import view3
 
 
-# sys.path.append('..')
-# from Controllers.clickController import clickController
-# from Controllers.statusController import statusController
-
 
 class View:
-    def __init__(self, statusController, clickController):
+    def __init__(self, statusController, clickController, hwndController):
         self.path = sys.path[0]
 
         self.statusController = statusController
         self.clickController = clickController
+        self.hwndController = hwndController
         self.root = tk.Tk()
 
         self.times = tk.StringVar()
-        self.get_hwnd = tk.StringVar()
+        self.connection = tk.StringVar()
         self.history_name = tk.StringVar()
         self.now_status_skill = tk.StringVar()
         self.now_status_support = tk.StringVar()
@@ -32,6 +29,11 @@ class View:
         self.view3open = False
         self.get_history_title()
         self.get_support_title()
+
+        self.window = 'BlueStacks App Player '
+        self.innerWindow = 'Qt5154QWindowIcon'
+        self.hwnd = ''
+        self.innerHwnd = ''
 
         self.root.title('FGO Scrip')
         self.root.geometry('1000x800')
@@ -58,16 +60,9 @@ class View:
         self._make_button('+5', 'Times', 3, 4)
         self._make_button('unlimited', 'Times', 3, 5)
 
-        # self._support_area(4, 'support')
 
         self._to_another_view('Battle Information', 4, 0)
 
-        # self._battle_area('Battle1', 'battle1', 6)
-        # self._battle_area('Battle2', 'battle2', 13)
-        # self._battle_area('Battle3', 'battle3', 20)
-
-        # self._make_label('Remember', 27, 0)
-        # self._make_Save_area(28, 0)
         self._make_combobox(self.history_title, 'read_history', 29, 0)
 
         self._make_label('Now Status', 30, 0)
@@ -90,26 +85,31 @@ class View:
         def button_event():
             print(func)
             if func == 'get_hwnd':
-                # self.get_hwnd.set(self.statusController.on_button_click(text, func))
-                get_hwnd = self.statusController.get_hwnd()
-                self.get_hwnd.set(get_hwnd)
-                print(get_hwnd)
-                if get_hwnd == 'Fail':
+                connection = self.hwndController.connection(self.window, self.innerWindow)
+                hwnd = self.hwndController.get_hwnd(self.window)
+                self.connection.set(connection)
+                print(connection)
+                if connection == 'Fail':
                     if self.view3open == False:
                         self.view3open = True
                         view3(self).main()
+
             elif func == 'Times':
-                # self.time = self.statusController.on_button_click(text, func)
                 self.time = self.statusController.Times(text)
                 self.times.set(self.time)
             elif func == 'Save':
                 self.get_history_title()
             elif func == 'start':
-                # self.clickController.on_button_click(text, func, self.support, self.skill, self.time)
-                self.clickController.start(self.support, self.skill, self.time)
+                connection = self.hwndController.connection(self.window, self.innerWindow)
+                self.connection.set(connection)
+                if connection == 'Success':
+                    self.hwnd = self.hwndController.get_hwnd(self.window)
+                    self.innerHwnd = self.hwndController.get_inner_hwnd(self.window, self.innerWindow)
+                    self.clickController.start(self.support, self.skill, self.time, self.hwnd, self.innerHwnd)
             elif func == 'end':
-                # self.clickController.on_button_click(text, func)
                 self.clickController.end()
+                self.time = self.statusController.Times(func)
+                self.times.set(self.time)
             
 
         button_Text = tk.StringVar()
@@ -122,7 +122,6 @@ class View:
         def button_event():
             if self.view2open == False:
                 self.view2open = True
-                # view2(self)
                 view2(self).main()
                 print('kk')
                 
@@ -149,7 +148,7 @@ class View:
 
 
     def _make_get_hwnd_label(self, x, y):
-        get_hwnd = ttk.Entry(self.root, textvariable=self.get_hwnd, state='disabled')
+        get_hwnd = ttk.Entry(self.root, textvariable=self.connection, state='disabled')
         get_hwnd.grid(row=x, column=y)
 
 

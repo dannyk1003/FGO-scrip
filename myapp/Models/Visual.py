@@ -1,13 +1,10 @@
-import win32api, win32gui, win32con, win32com.client
+import win32gui
 import numpy as np
 import time
 import pyautogui
 from PIL import Image, ImageQt
-# from PyQt5.QtWidgets import QApplication
 from PyQt6.QtWidgets import QApplication
 import sys
-import cv2
-import pythoncom
 
 
 class Visual:

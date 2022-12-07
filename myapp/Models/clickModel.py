@@ -14,52 +14,52 @@ class clickModel:
         self.path = sys.path[0]
 
         self.times = 0
-        self.window = 'BlueStacks App Player'
-        self.innerWindow = 'Qt5154QWindowIcon'
+        # self.window = 'BlueStacks App Player '
+        # self.innerWindow = 'Qt5154QWindowIcon'
         self.hwnd = ''
         self.innerHwnd = ''
         self.connect = ''
         
 
-        self.battleSkill = {'b1p0s1': None, 'b1p1s1': None, 'b1p2s1': None, 'b1p3s1': None, 
-                            'b1p0s2': None, 'b1p1s2': None, 'b1p2s2': None, 'b1p3s2': None, 
-                            'b1p0s3': None, 'b1p1s3': None, 'b1p2s3': None, 'b1p3s3': None,
-                            'b2p0s1': None, 'b2p1s1': None, 'b2p2s1': None, 'b2p3s1': None,
-                            'b2p0s2': None, 'b2p1s2': None, 'b2p2s2': None, 'b2p3s2': None,
-                            'b2p0s3': None, 'b2p1s3': None, 'b2p2s3': None, 'b2p3s3': None,
-                            'b3p0s1': None, 'b3p1s1': None, 'b3p2s1': None, 'b3p3s1': None,
-                            'b3p0s2': None, 'b3p1s2': None, 'b3p2s2': None, 'b3p3s2': None,
-                            'b3p0s3': None, 'b3p1s3': None, 'b3p2s3': None, 'b3p3s3': None,
-                            }
+        # self.battleSkill = {'b1p0s1': None, 'b1p1s1': None, 'b1p2s1': None, 'b1p3s1': None, 
+        #                     'b1p0s2': None, 'b1p1s2': None, 'b1p2s2': None, 'b1p3s2': None, 
+        #                     'b1p0s3': None, 'b1p1s3': None, 'b1p2s3': None, 'b1p3s3': None,
+        #                     'b2p0s1': None, 'b2p1s1': None, 'b2p2s1': None, 'b2p3s1': None,
+        #                     'b2p0s2': None, 'b2p1s2': None, 'b2p2s2': None, 'b2p3s2': None,
+        #                     'b2p0s3': None, 'b2p1s3': None, 'b2p2s3': None, 'b2p3s3': None,
+        #                     'b3p0s1': None, 'b3p1s1': None, 'b3p2s1': None, 'b3p3s1': None,
+        #                     'b3p0s2': None, 'b3p1s2': None, 'b3p2s2': None, 'b3p3s2': None,
+        #                     'b3p0s3': None, 'b3p1s3': None, 'b3p2s3': None, 'b3p3s3': None,
+        #                     }
         self.apple = ''
 
 
-    def get_window(self):
-        self.hwnd = win32gui.FindWindow(None, self.window)
+    # def get_window(self):
+    #     self.hwnd = win32gui.FindWindow(None, self.window)
 
-        if self.hwnd == 0:
-            self.connect = 'Fail'
+    #     if self.hwnd == 0:
+    #         self.connect = 'Fail'
 
-        else:
+    #     else:
 
-            def get_inner_windows(hwnd):
-                def callback(hwnd, hwnds):
-                    if win32gui.IsWindowVisible(hwnd) and win32gui.IsWindowEnabled(hwnd):
-                        hwnds[win32gui.GetClassName(hwnd)] = hwnd
-                    return True
-                hwnds_dict = dict()
-                win32gui.EnumChildWindows(hwnd, callback, hwnds_dict)
+    #         def get_inner_windows(hwnd):
+    #             def callback(hwnd, hwnds):
+    #                 if win32gui.IsWindowVisible(hwnd) and win32gui.IsWindowEnabled(hwnd):
+    #                     hwnds[win32gui.GetClassName(hwnd)] = hwnd
+    #                 return True
+    #             hwnds_dict = dict()
+    #             win32gui.EnumChildWindows(hwnd, callback, hwnds_dict)
 
-                return hwnds_dict
+    #             return hwnds_dict
 
-            self.innerHwnd = get_inner_windows(self.hwnd)[self.innerWindow]
-            print(self.hwnd, self.innerHwnd)
+    #         self.innerHwnd = get_inner_windows(self.hwnd)[self.innerWindow]
+    #         print(self.hwnd, self.innerHwnd)
 
 
-            self.connect = 'Success'
-            self.position()
+    #         self.connect = 'Success'
+    #         self.position()
         
-        return self.connect
+    #     return self.connect
 
 
     def doClick(self, position):
@@ -82,8 +82,14 @@ class clickModel:
         win32gui.SetForegroundWindow(self.hwnd)
 
     
-    def status_init(self, now_status_support, now_status_skill):
+    def status_init(self, now_status_support, now_status_skill, hwnd, innerHwnd):
+        pythoncom.CoInitialize()
+        self.hwnd = hwnd
+        self.innerHwnd = innerHwnd
+
         self.Visual = Visual(self.hwnd, self.innerHwnd)
+        
+        self.position()
         if now_status_support != '':
             self.supporter = now_status_support
         else:
@@ -99,40 +105,22 @@ class clickModel:
 
     def runScrip(self):
     
-        pythoncom.CoInitialize()
-        
-        # self.status_init(now_status_support, now_status_skill)
+        # pythoncom.CoInitialize()
 
-        # while True:
-        #     time.sleep(1)
-        #     print('on going')
+        self.window_to_front()
 
-        if self.connect == 'Success': # 連線成功
+        self.go_again()
 
-            self.window_to_front()
+        self.AP_recovery()
 
-            # self.doClick(self.mission)
-            # time.sleep(1)
-            # for times in range(self.times): # 次數大於一次時
-            self.go_again()
+        self.select_support()
 
-            # print('剩餘次數', self.times)
-            # print('第', times, '次')
-
-            self.AP_recovery()
-
-            self.select_support()
-
-
-            for i in range(1, 4):
-                self.startBattle(i)
-                
-            print('battle end')
+        for i in range(1, 4):
+            self.startBattle(i)
             
-            # self.go_again()
-            # self.times -= 1            
+        print('battle end')       
 
-            print('success')
+        print('success')
 
 
     def position(self):

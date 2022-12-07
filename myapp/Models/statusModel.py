@@ -8,7 +8,7 @@ class statusModel:
         self.path = sys.path[0]
 
         self.times = 0
-        self.window = 'BlueStacks App Player'
+        self.window = 'BlueStacks App Player '
         self.innerWindow = 'Qt5154QWindowIcon'
         self.hwnd = ''
         self.innerHwnd = ''
@@ -38,9 +38,12 @@ class statusModel:
             self.times += 1
         elif text == '+5':
             self.times += 5
+        elif text == 'end':
+            self.times = 0
 
         if self.times <= 0:
             self.times = 0
+        
 
         return self.times
 
@@ -62,10 +65,12 @@ class statusModel:
                 win32gui.EnumChildWindows(hwnd, callback, hwnds_dict)
 
                 return hwnds_dict
-            
-            self.innerHwnd = get_inner_windows(self.hwnd)[self.innerWindow]
-            print(self.hwnd, self.innerHwnd)
-            self.connect = 'Success'
+            if get_inner_windows(self.hwnd) == {}:
+                self.connect = 'Fail'
+            else:
+                self.innerHwnd = get_inner_windows(self.hwnd)[self.innerWindow]
+                print(self.hwnd, self.innerHwnd)
+                self.connect = 'Success'
         
         return self.connect
 

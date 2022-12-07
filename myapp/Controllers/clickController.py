@@ -30,11 +30,11 @@ class clickController:
         self._async_raise(thread.ident, SystemExit)
 
     
-    def start(self, now_status_support, now_status_skill, time):
-        result = self.model.get_window()
+    def start(self, now_status_support, now_status_skill, time, hwnd, innerHwnd):
+        # result = self.model.get_window()
 
         if self.thread_start == 'No':
-            self.thread_start = threading.Thread(target=self.runScrip, args = (now_status_support, now_status_skill, time))
+            self.thread_start = threading.Thread(target=self.runScrip, args = (now_status_support, now_status_skill, time, hwnd, innerHwnd))
             self.thread_start.start()
 
 
@@ -47,8 +47,10 @@ class clickController:
             self.thread_start = 'No'
 
     
-    def runScrip(self, now_status_support, now_status_skill, time):
-        self.model.status_init(now_status_support, now_status_skill)
+    def runScrip(self, now_status_support, now_status_skill, time, hwnd, innerHwnd):
+        print('abc')
+        self.model.status_init(now_status_support, now_status_skill, hwnd, innerHwnd)
+        print('def')
 
         for i in range(time):
             print('now is times:', i)
