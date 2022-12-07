@@ -20,17 +20,6 @@ class clickModel:
         self.innerHwnd = ''
         self.connect = ''
         
-
-        # self.battleSkill = {'b1p0s1': None, 'b1p1s1': None, 'b1p2s1': None, 'b1p3s1': None, 
-        #                     'b1p0s2': None, 'b1p1s2': None, 'b1p2s2': None, 'b1p3s2': None, 
-        #                     'b1p0s3': None, 'b1p1s3': None, 'b1p2s3': None, 'b1p3s3': None,
-        #                     'b2p0s1': None, 'b2p1s1': None, 'b2p2s1': None, 'b2p3s1': None,
-        #                     'b2p0s2': None, 'b2p1s2': None, 'b2p2s2': None, 'b2p3s2': None,
-        #                     'b2p0s3': None, 'b2p1s3': None, 'b2p2s3': None, 'b2p3s3': None,
-        #                     'b3p0s1': None, 'b3p1s1': None, 'b3p2s1': None, 'b3p3s1': None,
-        #                     'b3p0s2': None, 'b3p1s2': None, 'b3p2s2': None, 'b3p3s2': None,
-        #                     'b3p0s3': None, 'b3p1s3': None, 'b3p2s3': None, 'b3p3s3': None,
-        #                     }
         self.apple = ''
 
 
