@@ -1,9 +1,7 @@
 # 點擊做法
 import win32api, win32gui, win32con, win32com.client
-import numpy as np
 import time
 import pyautogui
-import sys
 import pythoncom
 import json
 from Models.Visual import Visual
@@ -64,37 +62,45 @@ class clickModel:
         self.window_to_front()
 
 
-    def runScrip(self):
-        step = 0
+    def now_step(self):
+        self.step = 0
         n1 = self.CheckBattleCount(1)
         n2 = self.CheckBattleCount(2)
         n3 = self.CheckBattleCount(3)
+        n = self.Visual.locateOnImage('clothes')
+        if n != None:
+            print(n1, n2, n3)
+            if n1 != None:
+                self.step = 1
+            if n2 != None:
+                self.step = 2
+            if n3 != None:
+                self.step = 3
+        print('now step is', self.step)
 
-        if step == 0:
+
+    def runScrip(self):
+
+        if self.step == 0:
             self.go_again()
-
             self.AP_recovery()
-
             self.select_support()
-
-            step += 1
+            self.step += 1
         
-        if step == 1:
+        if  self.step == 1:
             self.startBattle(1)
-            step += 1
+            self.step += 1
 
-        if step == 2:
+        if  self.step == 2:
             self.startBattle(2)
-            step += 1
+            self.step += 1
 
-        if step == 3:
+        if  self.step == 3:
             self.startBattle(3)
-            step += 1
+            self.step += 1
             
-        print('battle end')  
-        step = 0     
-
-        print('success')
+        print('battle end')
+        self.step = 0       
 
 
     def position(self):

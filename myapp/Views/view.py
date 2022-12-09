@@ -303,5 +303,3 @@ class View:
                 self.supporter[i].append(None)
             print('No Supporter')
         print(self.path)
-        # print(sys.path)
-        # print(os.path.realpath(__file__))

@@ -4,7 +4,6 @@ import threading
 import inspect
 import ctypes
 
-# sys.path.append('..')
 
 from Models.clickModel import clickModel
 
@@ -51,12 +50,14 @@ class clickController:
     def runScrip(self, now_status_support, now_status_skill, time, hwnd, innerHwnd):
         print('abc')
         self.model.status_init(now_status_support, now_status_skill, hwnd, innerHwnd)
+        self.model.now_step()
         print('def')
 
         for i in range(time):
             print('now is times:', i)
             self.model.runScrip()
         self.thread_start = 'No'
+        print('success')
         
     
 
