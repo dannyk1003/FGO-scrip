@@ -1,4 +1,5 @@
 # FGO-scrip
 This is my practice for making a scrip to play some games.
 
-download : https://drive.google.com/drive/folders/12mT9aPMD4HDEIMABSdJ2PwWA9a_FToM3?usp=sharing
+download : https://www.asuswebstorage.com/navigate/a/#/s/8A37AA704A9340A18CEE456729B63438Y
+password : danny-fgo
