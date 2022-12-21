@@ -7,8 +7,8 @@ class hwndModel:
     def __init__(self, path):
         self.path = path
 
-        self.window = ''
-        self.innerWindow = ''
+        self.window = 'BlueStacks App Player'
+        self.innerWindow = 'Qt5154QWindowIcon'
         self.hwnd = ''
         self.innerHwnd = ''
         self.connect = ''

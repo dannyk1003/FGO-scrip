@@ -6,11 +6,6 @@ class statusController:
         self.model = statusModel(path)
         self.path = path
 
-
-    def get_hwnd(self):
-        result = self.model.get_window()
-        return result
-
     
     def Times(self, text):
         result = self.model.times_counter(text)

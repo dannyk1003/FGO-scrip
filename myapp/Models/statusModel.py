@@ -9,25 +9,12 @@ class statusModel:
         self.path = path
 
         self.times = 0
-        self.window = 'BlueStacks App Player '
-        self.innerWindow = 'Qt5154QWindowIcon'
-        self.hwnd = ''
-        self.innerHwnd = ''
         self.connect = ''
         self.history_title = list()
         self.historyDB = historyDB(self.path)
 
         self.battleSkill_init()
-        # self.battleSkill = {'b1p0s1': None, 'b1p1s1': None, 'b1p2s1': None, 'b1p3s1': None, 
-        #                     'b1p0s2': None, 'b1p1s2': None, 'b1p2s2': None, 'b1p3s2': None, 
-        #                     'b1p0s3': None, 'b1p1s3': None, 'b1p2s3': None, 'b1p3s3': None,
-        #                     'b2p0s1': None, 'b2p1s1': None, 'b2p2s1': None, 'b2p3s1': None,
-        #                     'b2p0s2': None, 'b2p1s2': None, 'b2p2s2': None, 'b2p3s2': None,
-        #                     'b2p0s3': None, 'b2p1s3': None, 'b2p2s3': None, 'b2p3s3': None,
-        #                     'b3p0s1': None, 'b3p1s1': None, 'b3p2s1': None, 'b3p3s1': None,
-        #                     'b3p0s2': None, 'b3p1s2': None, 'b3p2s2': None, 'b3p3s2': None,
-        #                     'b3p0s3': None, 'b3p1s3': None, 'b3p2s3': None, 'b3p3s3': None,
-        #                     }  
+
         self.apple = ''
 
     
@@ -59,33 +46,6 @@ class statusModel:
         
 
         return self.times
-
-
-    def get_window(self):
-        self.hwnd = win32gui.FindWindow(None, self.window)
-
-        if self.hwnd == 0:
-            self.connect = 'Fail'
-
-        else:
-
-            def get_inner_windows(hwnd):
-                def callback(hwnd, hwnds):
-                    if win32gui.IsWindowVisible(hwnd) and win32gui.IsWindowEnabled(hwnd):
-                        hwnds[win32gui.GetClassName(hwnd)] = hwnd
-                    return True
-                hwnds_dict = dict()
-                win32gui.EnumChildWindows(hwnd, callback, hwnds_dict)
-
-                return hwnds_dict
-            if get_inner_windows(self.hwnd) == {}:
-                self.connect = 'Fail'
-            else:
-                self.innerHwnd = get_inner_windows(self.hwnd)[self.innerWindow]
-                print(self.hwnd, self.innerHwnd)
-                self.connect = 'Success'
-        
-        return self.connect
 
     
     def battle(self, title, battle, player, skill):

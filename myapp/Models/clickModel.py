@@ -16,7 +16,7 @@ class clickModel:
         self.innerHwnd = ''
         self.connect = ''
         
-        self.apple = ''
+        self.apple = None
 
 
     def doClick(self, position):
@@ -39,10 +39,11 @@ class clickModel:
         win32gui.SetForegroundWindow(self.hwnd)
 
     
-    def status_init(self, now_status_support, now_status_skill, hwnd, innerHwnd):
+    def status_init(self, now_status_support, now_status_skill, apple, hwnd, innerHwnd):
         pythoncom.CoInitialize()
         self.hwnd = hwnd
         self.innerHwnd = innerHwnd
+        self.apple = apple
 
         self.Visual = Visual(self.hwnd, self.innerHwnd, self.path)
         
@@ -83,7 +84,9 @@ class clickModel:
 
         if self.step == 0:
             self.go_again()
-            self.AP_recovery()
+            ap = self.AP_recovery()
+            if ap == False:
+                return 0
             self.select_support()
             self.step += 1
         
@@ -147,7 +150,7 @@ class clickModel:
 
                 while True:
                     self.main_screen()
-                    self.useAttack()
+                    self.useAttack(n)
                     self.main_screen()
                     battle_count_position = self.CheckBattleCount(n)
                     with_servant_connect_position = self.Visual.locateOnImage('with_servant_connect')
@@ -222,15 +225,22 @@ class clickModel:
                     self.sure_doClick(self.toPlayer[m])
                 time.sleep(4)
 
-    def useAttack(self):
+    def useAttack(self, n):
         self.position()
+
+        p1np = 'b' + str(n) + 'p1NP'
+        p2np = 'b' + str(n) + 'p2NP'
+        p3np = 'b' + str(n) + 'p3NP'
+        np_list = [self.battleSkill[p1np], self.battleSkill[p2np],self.battleSkill[p3np]]
+
 
         self.doClick(self.attack)
         time.sleep(2)
         
-        for i in range(3):
-            self.doClick(self.big[i])
-            time.sleep(2)
+        for i, p in enumerate(np_list):
+            if p == 'ON':
+                self.doClick(self.big[i])
+                time.sleep(2)
 
         for j in range(3):
             self.doClick(self.small[j])
@@ -286,7 +296,7 @@ class clickModel:
 
         # supporter_position = self.locateOnImage(rf"\Support\{self.supporter['type']}\{self.supporter['supporter']}", 'ScreenShot')
 
-        supporter_position = self.Visual.locateOnImage(rf"\Support\{self.supporter['type']}\{self.supporter['supporter']}")
+        supporter_position = self.Visual.locateOnImage(rf"\Support\{self.supporter['type']}\{self.supporter['character']}")
 
         print(supporter_position)
 
@@ -321,7 +331,7 @@ class clickModel:
                 
                 # supporter_position = self.locateOnImage(rf"\Support\{self.supporter['type']}\{self.supporter['supporter']}", 'ScreenShot')
 
-                supporter_position = self.Visual.locateOnImage(rf"\Support\{self.supporter['type']}\{self.supporter['supporter']}")
+                supporter_position = self.Visual.locateOnImage(rf"\Support\{self.supporter['type']}\{self.supporter['character']}")
 
                 if supporter_position != None:
                     time.sleep(1)
@@ -374,11 +384,12 @@ class clickModel:
 
 
     def AP_recovery(self):
-        self.apple = 'bronze'
 
         gold_position = self.Visual.locateOnImage(rf"\AP_Recovery\gold")
 
         if gold_position != None:
+            if self.apple == None:
+                return False
             while True:
                 apple_position = self.Visual.locateOnImage(rf"\AP_Recovery\{self.apple}")
 
@@ -408,8 +419,8 @@ class clickModel:
         while True:
             self.doClick(position)
             after = self.Visual.get_900_506_image()
-            before.show()
-            after.show()
+            # before.show()
+            # after.show()
             if click_check(before, after):
                 break
             time.sleep(1)

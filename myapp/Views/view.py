@@ -32,8 +32,9 @@ class View:
         self.GetHwndViewOpen = False
         self.get_history_title()
         self.get_support_title()
+        self.apple = None
 
-        self.window = 'BlueStacks App Player '
+        self.window = 'BlueStacks App Player'
         self.innerWindow = 'Qt5154QWindowIcon'
         self.hwnd = ''
         self.innerHwnd = ''
@@ -68,6 +69,9 @@ class View:
 
         self._to_another_view('Read History', 4, 0)
         self._to_another_view('Battle Information', 4, 1)
+
+        self._make_label('AP Recovery', 4, 2)
+        self._make_apple_combobox(29, 2)
 
         self._make_history_title_combobox(29, 0)
         self._make_button('delete', 'delete', 29, 1)
@@ -112,7 +116,7 @@ class View:
                 if connection == 'Success':
                     self.hwnd = self.hwndController.get_hwnd(self.window)
                     self.innerHwnd = self.hwndController.get_inner_hwnd(self.window, self.innerWindow)
-                    self.clickController.start(self.supporter, self.battleSkill, self.time, self.hwnd, self.innerHwnd)
+                    self.clickController.start(self.supporter, self.battleSkill, self.apple, self.time, self.hwnd, self.innerHwnd)
             elif func == 'end':
                 self.clickController.end()
                 self.time = self.statusController.Times(func)
@@ -201,47 +205,7 @@ class View:
 
         self.now_history_name = self.history_title_combobox.get()
 
-        self.history_title_combobox.bind("<<ComboboxSelected>>", combobox_func)
-
-
-
-        
-        
-    def _battle_area(self, text, func, x):
-        c = 'clothes'
-        p1 = 'player1'
-        p2 = 'player2'
-        p3 = 'player3'
-        to_who = ['None', p1, p2, p3]
-        s1 = 'skill1'
-        s2 = 'skill2'
-        s3 = 'skill3'
-
-        self._make_label(text, x, 0)
-        self._make_label('clothesS1', x+1, 0)
-        self._make_combobox(to_who, func, x+2, 0, c, s1)
-        self._make_label('P1S1', x+1, 1)
-        self._make_combobox(to_who, func, x+2, 1, p1, s1)
-        self._make_label('P2S1', x+1, 2)
-        self._make_combobox(to_who, func, x+2, 2, p2, s1)
-        self._make_label('P3S1', x+1, 3)
-        self._make_combobox(to_who, func, x+2, 3, p3, s1)
-        self._make_label('clothesS2', x+3, 0)
-        self._make_combobox(to_who, func, x+4, 0, c, s2)
-        self._make_label('P1S2', x+3, 1)
-        self._make_combobox(to_who, func, x+4, 1, p1, s2)
-        self._make_label('P2S2', x+3, 2)
-        self._make_combobox(to_who, func, x+4, 2, p2, s2)
-        self._make_label('P3S2', x+3, 3)
-        self._make_combobox(to_who, func, x+4, 3, p3, s2)
-        self._make_label('clothesS3', x+5, 0)
-        self._make_combobox(to_who, func, x+6, 0, c, s3)
-        self._make_label('P1S3', x+5, 1)
-        self._make_combobox(to_who, func, x+6, 1, p1, s3)
-        self._make_label('P2S3', x+5, 2)
-        self._make_combobox(to_who, func, x+6, 2, p2, s3)
-        self._make_label('P3S3', x+5, 3)
-        self._make_combobox(to_who, func, x+6, 3, p3, s3)        
+        self.history_title_combobox.bind("<<ComboboxSelected>>", combobox_func)     
 
 
     def _make_Save_area(self, x, y):
@@ -293,3 +257,17 @@ class View:
     def exit(self):
         print('view end')
         sys.exit(0)
+
+
+    def _make_apple_combobox(self, x, y):
+        def combobox_func(event):
+            title = combobox.get()
+            self.apple = title
+
+
+
+        combobox = ttk.Combobox(self.root, state='readonly')
+        combobox['values'] = [None, 'Gold', 'Silver', 'Bronze', 'Stone']
+        combobox.current(0)
+        combobox.grid(row=x, column=y)
+        combobox.bind("<<ComboboxSelected>>", combobox_func)     

@@ -1,5 +1,5 @@
 # 點擊流程
-import sys
+import tkinter.messagebox
 import threading
 import inspect
 import ctypes
@@ -30,11 +30,11 @@ class clickController:
         self._async_raise(thread.ident, SystemExit)
 
     
-    def start(self, now_status_support, now_status_skill, time, hwnd, innerHwnd):
+    def start(self, now_status_support, now_status_skill, apple, time, hwnd, innerHwnd):
         # result = self.model.get_window()
 
         if self.thread_start == 'No':
-            self.thread_start = threading.Thread(target=self.runScrip, args = (now_status_support, now_status_skill, time, hwnd, innerHwnd))
+            self.thread_start = threading.Thread(target=self.runScrip, args = (now_status_support, now_status_skill, apple, time, hwnd, innerHwnd))
             self.thread_start.start()
 
 
@@ -47,9 +47,9 @@ class clickController:
             self.thread_start = 'No'
 
     
-    def runScrip(self, now_status_support, now_status_skill, time, hwnd, innerHwnd):
+    def runScrip(self, now_status_support, now_status_skill, apple, time, hwnd, innerHwnd):
         print('abc')
-        self.model.status_init(now_status_support, now_status_skill, hwnd, innerHwnd)
+        self.model.status_init(now_status_support, now_status_skill, apple, hwnd, innerHwnd)
         self.model.now_step()
         print('def')
 
@@ -58,6 +58,8 @@ class clickController:
             self.model.runScrip()
         self.thread_start = 'No'
         print('success')
+        tkinter.messagebox.showinfo("Info", "Scrip End")
+
         
     
 
