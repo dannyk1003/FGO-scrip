@@ -8,8 +8,8 @@ import sys
 
 
 class Visual:
-    def __init__(self, hwnd, innerHwnd):
-        self.path = sys.path[0]
+    def __init__(self, hwnd, innerHwnd, path):
+        self.path = path
         self.hwnd = hwnd
         self.innerHwnd = innerHwnd
         self.app = QApplication(sys.argv)

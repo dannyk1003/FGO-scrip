@@ -6,9 +6,9 @@ import sys
 from Models.statusModel import statusModel
 
 class statusController:
-    def __init__(self):
-        self.model = statusModel()
-        self.path = sys.path[0]
+    def __init__(self, path):
+        self.model = statusModel(path)
+        self.path = path
 
 
     def get_hwnd(self):

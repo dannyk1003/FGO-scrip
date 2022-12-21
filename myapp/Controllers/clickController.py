@@ -9,8 +9,9 @@ import ctypes
 from Models.clickModel import clickModel
 
 class clickController:
-    def __init__(self):
-        self.model = clickModel()
+    def __init__(self, path):
+        self.path = path
+        self.model = clickModel(path)
         self.thread_start = 'No'
 
     

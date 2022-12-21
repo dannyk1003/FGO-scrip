@@ -6,9 +6,9 @@ import sys
 from Models.hwndModel import hwndModel
 
 class hwndController:
-    def __init__(self):
-        self.model = hwndModel()
-        self.path = sys.path[0]
+    def __init__(self, path):
+        self.model = hwndModel(path)
+        self.path = path
 
 
     def connection(self, window, innerWindow):

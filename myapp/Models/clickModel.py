@@ -10,45 +10,15 @@ from Models.Visual import Visual
 
 
 class clickModel:
-    def __init__(self):
-        self.path = sys.path[0]
+    def __init__(self, path):
+        self.path = path
 
         self.times = 0
-        # self.window = 'BlueStacks App Player '
-        # self.innerWindow = 'Qt5154QWindowIcon'
         self.hwnd = ''
         self.innerHwnd = ''
         self.connect = ''
         
         self.apple = ''
-
-
-    # def get_window(self):
-    #     self.hwnd = win32gui.FindWindow(None, self.window)
-
-    #     if self.hwnd == 0:
-    #         self.connect = 'Fail'
-
-    #     else:
-
-    #         def get_inner_windows(hwnd):
-    #             def callback(hwnd, hwnds):
-    #                 if win32gui.IsWindowVisible(hwnd) and win32gui.IsWindowEnabled(hwnd):
-    #                     hwnds[win32gui.GetClassName(hwnd)] = hwnd
-    #                 return True
-    #             hwnds_dict = dict()
-    #             win32gui.EnumChildWindows(hwnd, callback, hwnds_dict)
-
-    #             return hwnds_dict
-
-    #         self.innerHwnd = get_inner_windows(self.hwnd)[self.innerWindow]
-    #         print(self.hwnd, self.innerHwnd)
-
-
-    #         self.connect = 'Success'
-    #         self.position()
-        
-    #     return self.connect
 
 
     def doClick(self, position):
@@ -76,7 +46,7 @@ class clickModel:
         self.hwnd = hwnd
         self.innerHwnd = innerHwnd
 
-        self.Visual = Visual(self.hwnd, self.innerHwnd)
+        self.Visual = Visual(self.hwnd, self.innerHwnd, self.path)
         
         self.position()
         if now_status_support != '':
@@ -90,24 +60,39 @@ class clickModel:
         else:
             with open(rf'{self.path}\Configs\battleSkill_init.json','r') as fr:
                 self.battleSkill = json.load(fr)
+        
+        self.window_to_front()
 
 
     def runScrip(self):
-    
-        # pythoncom.CoInitialize()
+        step = 0
+        n1 = self.CheckBattleCount(1)
+        n2 = self.CheckBattleCount(2)
+        n3 = self.CheckBattleCount(3)
 
-        self.window_to_front()
+        if step == 0:
+            self.go_again()
 
-        self.go_again()
+            self.AP_recovery()
 
-        self.AP_recovery()
+            self.select_support()
 
-        self.select_support()
+            step += 1
+        
+        if step == 1:
+            self.startBattle(1)
+            step += 1
 
-        for i in range(1, 4):
-            self.startBattle(i)
+        if step == 2:
+            self.startBattle(2)
+            step += 1
+
+        if step == 3:
+            self.startBattle(3)
+            step += 1
             
-        print('battle end')       
+        print('battle end')  
+        step = 0     
 
         print('success')
 
@@ -371,8 +356,6 @@ class clickModel:
 
     def go_again(self):
         while True:
-            # go_again_position = self.locateOnImage(rf"go_again", 'ScreenShot')
-            # close_position = self.locateOnImage(rf"close", 'ScreenShot')
 
             go_again_position = self.Visual.locateOnImage(rf"go_again")
             close_position = self.Visual.locateOnImage(rf"close")
@@ -381,9 +364,8 @@ class clickModel:
                 if close_position == None:
                     self.doClick(self.next)
                     time.sleep(0.5)
-                else:
-                    # last_time_position = self.locateOnImage(rf"last_time", 'ScreenShot')
 
+                else:
                     last_time_position = self.Visual.locateOnImage(rf"last_time")
 
                     if last_time_position == None:

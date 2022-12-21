@@ -4,8 +4,8 @@ import json
 import sys
 
 class statusModel:
-    def __init__(self):
-        self.path = sys.path[0]
+    def __init__(self, path):
+        self.path = path
 
         self.times = 0
         self.window = 'BlueStacks App Player '
@@ -38,6 +38,8 @@ class statusModel:
             self.times += 1
         elif text == '+5':
             self.times += 5
+        elif text == 'unlimited':
+            self.times += 100
         elif text == 'end':
             self.times = 0
 

@@ -9,8 +9,8 @@ from Views.view3 import view3
 
 
 class View:
-    def __init__(self, statusController, clickController, hwndController):
-        self.path = sys.path[0]
+    def __init__(self, statusController, clickController, hwndController, path):
+        self.path = path
 
         self.statusController = statusController
         self.clickController = clickController
@@ -302,3 +302,6 @@ class View:
             for i in self.support_type:
                 self.supporter[i].append(None)
             print('No Supporter')
+        print(self.path)
+        # print(sys.path)
+        # print(os.path.realpath(__file__))

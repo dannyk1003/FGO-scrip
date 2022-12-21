@@ -1,12 +1,11 @@
-# 紀錄狀態
-import win32api, win32gui, win32con, win32com.client
-import json
+# 找尋hwnd
+import win32gui
 import sys
 import numpy as np
 
 class hwndModel:
-    def __init__(self):
-        self.path = sys.path[0]
+    def __init__(self, path):
+        self.path = path
 
         self.window = ''
         self.innerWindow = ''
@@ -18,7 +17,7 @@ class hwndModel:
     def connection(self, window, innerWindow):
         self.window = window
         self.innerWindow = innerWindow
-        
+
         self.hwnd = win32gui.FindWindow(None, self.window)
 
         if self.hwnd == 0:

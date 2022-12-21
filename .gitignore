@@ -14,3 +14,6 @@ __pycache__/
 Test/
 share/
 *.json
+dist/
+build/
+*.spec
