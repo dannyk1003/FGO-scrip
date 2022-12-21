@@ -1,8 +1,4 @@
 # 狀態流程
-import sys
-
-# sys.path.append('..')
-
 from Models.statusModel import statusModel
 
 class statusController:
@@ -21,23 +17,51 @@ class statusController:
         return result
 
     
-    def Save(self, text):
-        self.model.write_history(text)
+    def Save(self, name):
+        # self.model.write_history(text)
+        self.model.add_history(name)
 
 
-    def battle(self, title, func, player, skill):
-        result = self.model.battle(title, func, player, skill)
+    def battle(self, title, battle, player, skill):
+        result = self.model.battle(title, battle, player, skill)
         return result
 
     
     def read_history(self, title):
-        result = self.model.read_history(title)
+        # result = self.model.read_history(title)
+        result = self.model.select_history(title)
         return result
 
     
     def support(self, title):
         result = self.model.support(title)
         return result
+
+    
+    def get_history_title(self):
+        result = self.model.get_history_title()
+        return result
+
+    
+    def battleSkill_init(self):
+        self.model.battleSkill_init()
+        result = [self.model.supporter, self.model.battleSkill]
+        return result
+
+    
+    def Noble_Phantasm(self, title, battle, player):
+        result = self.model.Noble_Phantasm(title, battle, player)
+        return result
+
+    
+    def modify(self, name):
+        self.model.modify_history(name)
+
+
+    def delete(self, name):
+        self.model.delete_history(name)
+
+
 
         
     

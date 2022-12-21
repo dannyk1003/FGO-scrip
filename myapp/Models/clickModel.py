@@ -32,7 +32,7 @@ class clickModel:
         win32gui.PostMessage(hwnd, win32con.WM_LBUTTONUP, win32con.MK_LBUTTON, long_position)
         time.sleep(0.5)
 
-   
+
     def window_to_front(self):
         shell = win32com.client.Dispatch("WScript.Shell")
         shell.SendKeys('%')
@@ -88,20 +88,20 @@ class clickModel:
             self.step += 1
         
         if  self.step == 1:
-            self.startBattle(1)
+            self.Battle(1)
             self.step += 1
 
         if  self.step == 2:
-            self.startBattle(2)
+            self.Battle(2)
             self.step += 1
 
         if  self.step == 3:
-            self.startBattle(3)
+            self.Battle(3)
             self.step += 1
             
         print('battle end')
         self.step = 0       
-
+    
 
     def position(self):
         x = win32gui.GetWindowRect(self.innerHwnd)[0]
@@ -127,17 +127,15 @@ class clickModel:
         self.mission = [x_long * 0.7, y_long * 0.26]
 
 
-    def startBattle(self, n): # battle n
-        self.main_screen()
-        
+    def Battle(self, n): # battle n
+        self.main_screen()        
         print('now is battle', n)
-        self.position()
 
         while True:
             battle_count_position = self.CheckBattleCount(n)
             print(battle_count_position)
 
-            if battle_count_position == None:
+            if battle_count_position == None: # 不是 battle n 就離開
                 break
 
             else:
@@ -147,46 +145,49 @@ class clickModel:
                         print(p)
                         self.useSkill(i, j, self.battleSkill[p])
 
-
                 while True:
                     self.main_screen()
                     self.useAttack()
                     self.main_screen()
                     battle_count_position = self.CheckBattleCount(n)
-                    # with_servent_connect_position = self.locateOnImage('with_servent_connect', 'FGO_ScreenShot')
-
-                    with_servent_connect_position = self.Visual.locateOnImage('with_servent_connect')
+                    with_servant_connect_position = self.Visual.locateOnImage('with_servant_connect')
 
                     if battle_count_position == None:
                         break
-                    elif with_servent_connect_position != None:
+                    elif with_servant_connect_position != None:
                         break
                 break
             
-
         print('battle ', n, ' end')
+
+    
+    def endBattle(self):
+        if self.main_screen() == 'with_servant_connect':
+            while True:
+                with_servant_connect_position = self.Visual.locateOnImage('with_servant_connect')
+                self.doClick(with_servant_connect_position)
+
+                time.sleep(1)
+                masterEXP_position = self.Visual.locateOnImage('masterEXP')                   
+
 
 
     def main_screen(self):
-        # clothes_position = self.locateOnImage('clothes', 'ScreenShot')
-        # with_servent_connect_position = self.locateOnImage('with_servent_connect', 'FGO_ScreenShot')
         clothes_position = self.Visual.locateOnImage('clothes')
-        with_servent_connect_position = self.Visual.locateOnImage('with_servent_connect')
+        with_servant_connect_position = self.Visual.locateOnImage('with_servant_connect')
 
         while True:
-            if clothes_position != None:
-                break
-            elif with_servent_connect_position != None:
-                break
+            if clothes_position != None: # 畫面上有 '御主技能'
+                return 'clothes'
+            elif with_servant_connect_position != None: # 畫面上有 '與從者的羈絆'
+                return 'with_servant_connect'
             else:
                 time.sleep(5)
-                # clothes_position = self.locateOnImage('clothes', 'ScreenShot')
-                # with_servent_connect_position = self.locateOnImage('with_servent_connect', 'FGO_ScreenShot')
                 clothes_position = self.Visual.locateOnImage('clothes')
-                with_servent_connect_position = self.Visual.locateOnImage('with_servent_connect')
+                with_servant_connect_position = self.Visual.locateOnImage('with_servant_connect')
 
 
-    def useSkill(self, p, n, m): # player p 的第n個技能, 給player m
+    def useSkill(self, p, n, m): # player p 的第 n 個技能, 給player m
         if m != None:
             player = 'p' + str(p) + 's' + str(n)
             print(player)
@@ -195,28 +196,30 @@ class clickModel:
                 while True:
                     if clothes_position != None:
                         time.sleep(0.5)
-                        self.doClick(self.clothes)
+                        # self.doClick(self.clothes)
+                        self.sure_doClick(self.clothes)
                         time.sleep(1)
                         break
                     else:
                         time.sleep(0.5)
                         clothes_position = self.Visual.locateOnImage('clothes')
             
-            self.doClick(self.playerSkill[player])
+            # self.doClick(self.playerSkill[player])
+            self.sure_doClick(self.playerSkill[player])
             time.sleep(4)
-            # img = pyautogui.locateOnScreen(r'img\Please_select_object.png')
 
             if self.skill_used_check() != None:
                 self.doClick(self.skill_used_check())
                 time.sleep(2)
                 if p == 0:
-                    self.doClick(self.clothes)
+                    # self.doClick(self.clothes)
+                    self.sure_doClick(self.clothes)
                     time.sleep(1)
             else:
-                # img = self.locateOnImage('Please_select_object', 'FGO_ScreenShot')
-                img = self.Visual.locateOnImage('Please_select_object')
-                if img != None:
-                    self.doClick(self.toPlayer[m])
+                Please_select_object_position = self.Visual.locateOnImage('Please_select_object')
+                if Please_select_object_position != None:
+                    # self.doClick(self.toPlayer[m])
+                    self.sure_doClick(self.toPlayer[m])
                 time.sleep(4)
 
     def useAttack(self):
@@ -237,17 +240,6 @@ class clickModel:
 
     
     def CheckBattleCount(self, count):
-        # win32gui.MoveWindow(self.hwnd, True, True, 960, 540, True)
-        # time.sleep(0.5)
-
-        # Now = self.get_image('Now')
-        # Now = self.get_900_506_image('Now')
-        # Now_cut = rf'{self.path}\img\screenShot\Now_cut_{count}.png'
-        # Now_cut_black = rf'{self.path}\img\screenShot\Now_cut_{count}_black.png'
-        # BattleCount = rf'{self.path}\img\BattleCount\Battle{count}.png'
-        # self.image_cut(Now, Now_cut, 620, 0, 633, 30)
-        # self.WordToBlack(Now_cut, Now_cut_black)
-
         Now = self.Visual.get_900_506_image()
         Now_cut = self.Visual.image_cut(Now, 620, 0, 633, 30)
         Now_cut_black = self.Visual.WordToBlack(Now_cut)
@@ -264,10 +256,6 @@ class clickModel:
         
 
     def skill_used_check(self):
-        # Now = self.get_image('Now')
-        # Now = self.get_900_506_image('Now')
-        # cancel = rf'{self.path}\img\cancel.png'
-
         Now = self.Visual.get_900_506_image()
         cancel = rf'{self.path}\img\cancel.png'
 
@@ -290,54 +278,54 @@ class clickModel:
             if support_choose_position != None:
                 break
 
-        # support_type_location = self.locateOnImage(rf"\Support\{self.supporter['type']}", 'ScreenShot')
+        # support_type_position = self.locateOnImage(rf"\Support\{self.supporter['type']}", 'ScreenShot')
             
-        support_type_location = self.Visual.locateOnImage(rf"\Support\{self.supporter['type']}")
+        support_type_position = self.Visual.locateOnImage(rf"\Support\{self.supporter['type']}")
 
-        self.doClick(support_type_location)
+        self.doClick(support_type_position)
 
-        # supporter_location = self.locateOnImage(rf"\Support\{self.supporter['type']}\{self.supporter['supporter']}", 'ScreenShot')
+        # supporter_position = self.locateOnImage(rf"\Support\{self.supporter['type']}\{self.supporter['supporter']}", 'ScreenShot')
 
-        supporter_location = self.Visual.locateOnImage(rf"\Support\{self.supporter['type']}\{self.supporter['supporter']}")
+        supporter_position = self.Visual.locateOnImage(rf"\Support\{self.supporter['type']}\{self.supporter['supporter']}")
 
-        print(supporter_location)
+        print(supporter_position)
 
-        if supporter_location != None:
+        if supporter_position != None:
             time.sleep(1)
-            self.doClick(supporter_location)
+            self.doClick(supporter_position)
         else:
             i = 0
             while i != 10:
                 i += 1
-                # go_down_location = self.locateOnImage(rf"\Support\go_down", 'ScreenShot')
+                # go_down_position = self.locateOnImage(rf"\Support\go_down", 'ScreenShot')
 
-                go_down_location = self.Visual.locateOnImage(rf"\Support\go_down")
+                go_down_position = self.Visual.locateOnImage(rf"\Support\go_down")
 
-                if go_down_location == None:
-                    # re_new_list_location = self.locateOnImage(rf"\Support\re_new_list", 'ScreenShot')
+                if go_down_position == None:
+                    # re_new_list_position = self.locateOnImage(rf"\Support\re_new_list", 'ScreenShot')
 
-                    re_new_list_location = self.Visual.locateOnImage(rf"\Support\re_new_list")
+                    re_new_list_position = self.Visual.locateOnImage(rf"\Support\re_new_list")
 
-                    self.doClick(re_new_list_location)
+                    self.doClick(re_new_list_position)
                     time.sleep(1)
-                    # yes_location = self.locateOnImage(rf"\Support\yes", 'ScreenShot')
+                    # yes_position = self.locateOnImage(rf"\Support\yes", 'ScreenShot')
 
-                    yes_location = self.Visual.locateOnImage(rf"\Support\yes")
+                    yes_position = self.Visual.locateOnImage(rf"\Support\yes")
 
-                    self.doClick(yes_location)
+                    self.doClick(yes_position)
                     time.sleep(1)
                     i = 0
                 else:
-                    self.doClick(go_down_location)
+                    self.doClick(go_down_position)
                     time.sleep(1)
                 
-                # supporter_location = self.locateOnImage(rf"\Support\{self.supporter['type']}\{self.supporter['supporter']}", 'ScreenShot')
+                # supporter_position = self.locateOnImage(rf"\Support\{self.supporter['type']}\{self.supporter['supporter']}", 'ScreenShot')
 
-                supporter_location = self.Visual.locateOnImage(rf"\Support\{self.supporter['type']}\{self.supporter['supporter']}")
+                supporter_position = self.Visual.locateOnImage(rf"\Support\{self.supporter['type']}\{self.supporter['supporter']}")
 
-                if supporter_location != None:
+                if supporter_position != None:
                     time.sleep(1)
-                    self.doClick(supporter_location)
+                    self.doClick(supporter_position)
                     break
         time.sleep(1)
         # mission_start_position = self.locateOnImage(rf"\Support\mission_start", 'ScreenShot')
@@ -362,58 +350,69 @@ class clickModel:
 
     def go_again(self):
         while True:
-
             go_again_position = self.Visual.locateOnImage(rf"go_again")
             close_position = self.Visual.locateOnImage(rf"close")
+            last_time_position = self.Visual.locateOnImage(rf"last_time")
 
-            if go_again_position == None:
-                if close_position == None:
+            if go_again_position == None: # 沒有連續出擊
+                if close_position == None: # 沒有關閉
                     self.doClick(self.next)
                     time.sleep(0.5)
 
-                else:
+                else: # 有關閉 -> 選關頁面
                     last_time_position = self.Visual.locateOnImage(rf"last_time")
 
-                    if last_time_position == None:
-                        self.doClick(self.mission)
+                    if last_time_position == None: # 沒有上次執行
+                        self.doClick(self.mission) # 按最上面那一關
                         break
-                    else:
-                        self.doClick(last_time_position)
+                    else: # 有上次執行
+                        self.doClick(last_time_position) # 按上次執行
                         break
-            else:
-                self.doClick(go_again_position)
+            else: # 有連續出擊
+                self.doClick(go_again_position) # 按連續出擊
                 break
 
 
     def AP_recovery(self):
         self.apple = 'bronze'
-        # gold_position = self.locateOnImage(rf"\AP_Recovery\gold", 'ScreenShot')
 
         gold_position = self.Visual.locateOnImage(rf"\AP_Recovery\gold")
 
         if gold_position != None:
             while True:
-                # apple_position = self.locateOnImage(rf"\AP_Recovery\{self.apple}", 'ScreenShot')
-
                 apple_position = self.Visual.locateOnImage(rf"\AP_Recovery\{self.apple}")
 
                 if apple_position != None:
                     self.doClick(apple_position)
                     time.sleep(1)
-                    # sure_position = self.locateOnImage(rf"\AP_Recovery\sure", 'ScreenShot')
 
                     sure_position = self.Visual.locateOnImage(rf"\AP_Recovery\sure")
 
                     self.doClick(sure_position)
                     break
-                else:
-                    # go_down_position = self.locateOnImage(rf"\AP_Recovery\go_down", 'ScreenShot')
 
+                else:
                     go_down_position = self.Visual.locateOnImage(rf"\AP_Recovery\go_down")
 
                     self.doClick(go_down_position)
                     time.sleep(1)
 
+
+
+
+    def sure_doClick(self, position):
+        def click_check(before, after, ):
+            return self.Visual.different_image_check(before, after)
+
+        before = self.Visual.get_900_506_image()
+        while True:
+            self.doClick(position)
+            after = self.Visual.get_900_506_image()
+            before.show()
+            after.show()
+            if click_check(before, after):
+                break
+            time.sleep(1)
 
 '''
 

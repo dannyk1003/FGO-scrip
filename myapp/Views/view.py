@@ -1,10 +1,12 @@
 # 顯示畫面
 import tkinter as tk
 from tkinter import ttk
+import tkinter.messagebox
 import os
 import sys
-from Views.view2 import view2
-from Views.view3 import view3
+from Views.BattleInformationView import BattleInformationView
+from Views.GetHwndView import GetHwndView
+from Views.ReadHistoryView import ReadHistoryView
 
 
 
@@ -22,11 +24,12 @@ class View:
         self.history_name = tk.StringVar()
         self.now_status_skill = tk.StringVar()
         self.now_status_support = tk.StringVar()
-        self.support = ''
-        self.skill = ''
+        self.supporter = ''
+        self.battleSkill = ''
         self.time = 0
-        self.view2open = False
-        self.view3open = False
+        self.BattleInformationViewOpen = False
+        self.ReadHistoryViewOpen = False
+        self.GetHwndViewOpen = False
         self.get_history_title()
         self.get_support_title()
 
@@ -37,6 +40,8 @@ class View:
 
         self.root.title('FGO Scrip')
         self.root.geometry('1000x800')
+
+        self.root.protocol('WM_DELETE_WINDOW', self.exit)
         
         self.layout()
         
@@ -61,9 +66,11 @@ class View:
         self._make_button('unlimited', 'Times', 3, 5)
 
 
-        self._to_another_view('Battle Information', 4, 0)
+        self._to_another_view('Read History', 4, 0)
+        self._to_another_view('Battle Information', 4, 1)
 
-        self._make_combobox(self.history_title, 'read_history', 29, 0)
+        self._make_history_title_combobox(29, 0)
+        self._make_button('delete', 'delete', 29, 1)
 
         self._make_label('Now Status', 30, 0)
         self._make_now_status_support_label(31, 0)
@@ -90,9 +97,9 @@ class View:
                 self.connection.set(connection)
                 print(connection)
                 if connection == 'Fail':
-                    if self.view3open == False:
-                        self.view3open = True
-                        view3(self).main()
+                    if self.GetHwndViewOpen == False:
+                        self.GetHwndViewOpen = True
+                        GetHwndView(self).main()
 
             elif func == 'Times':
                 self.time = self.statusController.Times(text)
@@ -105,11 +112,16 @@ class View:
                 if connection == 'Success':
                     self.hwnd = self.hwndController.get_hwnd(self.window)
                     self.innerHwnd = self.hwndController.get_inner_hwnd(self.window, self.innerWindow)
-                    self.clickController.start(self.support, self.skill, self.time, self.hwnd, self.innerHwnd)
+                    self.clickController.start(self.supporter, self.battleSkill, self.time, self.hwnd, self.innerHwnd)
             elif func == 'end':
                 self.clickController.end()
                 self.time = self.statusController.Times(func)
                 self.times.set(self.time)
+            elif func == 'delete':
+                self.statusController.delete(self.now_history_name)
+                self.get_history_title()
+                self.history_title_combobox['values'] = self.history_title
+                self.history_title_combobox.set('')
             
 
         button_Text = tk.StringVar()
@@ -120,10 +132,20 @@ class View:
     
     def _to_another_view(self, text, x, y):
         def button_event():
-            if self.view2open == False:
-                self.view2open = True
-                view2(self).main()
-                print('kk')
+            if text == 'Battle Information':
+                if self.BattleInformationViewOpen == False:
+                    self.BattleInformationViewOpen = True
+                    BattleInformationView(self).main()
+                    print('view: BattleInformationView end')
+
+            elif text == 'Read History':
+                if self.ReadHistoryViewOpen == False:
+                    if self.history_title_combobox.get() == '':
+                        tkinter.messagebox.showerror("Name Error", "Please select a valid name")
+                    else:
+                        self.ReadHistoryViewOpen = True
+                        ReadHistoryView(self).main()
+                        print('view: ReadHistoryView end')
                 
             
 
@@ -161,66 +183,28 @@ class View:
         now_status_skill = tk.Label(self.root, textvariable=self.now_status_skill, state='disabled', wraplength=600)
         now_status_skill.grid(row=x, column=y, columnspan=4)
 
-    
-    def _make_checkbutton(self, text, func, x, y):
-        def checkbutton_event():
-            self.statusController.on_checkbutton_click(text, func, var.get())
-            print(text, var.get())
 
-        checkbutton_Text = tk.StringVar()
-        var = tk.IntVar()
-        checkbutton = tk.Checkbutton(self.root, text = checkbutton_Text, variable=var, command=checkbutton_event)
-        checkbutton['text'] = text
-        checkbutton.grid(row=x, column=y)
-
-
-    def _make_combobox(self, text, func, x, y, player = None, skill = None):
+    def _make_history_title_combobox(self, x, y):
         def combobox_func(event):
-            title = combobox.get()
-            if func == 'battle1' or func == 'battle2' or func == 'battle3':
-                # self.skill = self.statusController.on_combobox_click(title, func, player, skill)
-                self.skill = self.statusController.battle(title, func, player, skill)
-                self.now_status_skill.set(self.skill)
-
-            elif func == 'read_history':
-                # self.support = self.statusController.on_combobox_click(title, func, player, skill)[0]
-                # self.skill = self.statusController.on_combobox_click(title, func, player, skill)[1]
-                self.support = self.statusController.read_history(title)[0]
-                self.skill = self.statusController.read_history(title)[1]
-                self.now_status_support.set(self.support)
-                self.now_status_skill.set(self.skill)
+            title = self.history_title_combobox.get()
+            self.now_history_name = title
+            self.supporter = self.statusController.read_history(title)[0]
+            self.battleSkill = self.statusController.read_history(title)[1]
+            print(type(self.statusController.read_history(title)))
+            self.now_status_support.set(self.supporter)
+            self.now_status_skill.set(self.battleSkill)
 
 
-        combobox = ttk.Combobox(self.root, state='readonly')
-        combobox['values'] = text
-        combobox.grid(row=x, column=y)
-        combobox.current(0)
+        self.history_title_combobox = ttk.Combobox(self.root, state='readonly', values=self.history_title)
+        print(self.history_title)
+        self.history_title_combobox.grid(row=x, column=y)
 
-        combobox.bind("<<ComboboxSelected>>", combobox_func)
+        self.now_history_name = self.history_title_combobox.get()
+
+        self.history_title_combobox.bind("<<ComboboxSelected>>", combobox_func)
 
 
-    def _support_area(self, x, func):
-        self._make_label('Support', x, 0)
-        def type_func(event):
-            support_type = combobox_type.get()
 
-            combobox_supporter['values'] = self.supporter[support_type]
-            print(self.supporter[support_type])
-            
-        def supporter_func(event):
-            supporter = combobox_supporter.get()
-            # self.support = self.statusController.on_combobox_click([combobox_type.get(), supporter], func, None, None)
-            self.support = self.statusController.support([combobox_type.get(), supporter])
-            self.now_status_support.set(self.support)
-
-        combobox_type = ttk.Combobox(self.root, state='readonly')
-        combobox_type['values'] = self.support_type
-        combobox_type.grid(row=x+1, column=0)
-        combobox_type.bind("<<ComboboxSelected>>", type_func)
-
-        combobox_supporter = ttk.Combobox(self.root, state='readonly')
-        combobox_supporter.grid(row=x+1, column=1)
-        combobox_supporter.bind("<<ComboboxSelected>>", supporter_func)
         
         
     def _battle_area(self, text, func, x):
@@ -279,27 +263,33 @@ class View:
 
 
     def get_history_title(self):
-        self.history_title = list()
-        if os.path.isdir(rf'{self.path}\history\battleSkill'):
-            title = os.listdir(rf'{self.path}\history\battleSkill')
-            for i in title:
-                self.history_title.append(i.rstrip('.json'))
-        else:
-            self.history_title.append(None)
+        # self.history_title = list()
+        # if os.path.isdir(rf'{self.path}\history\battleSkill'):
+        #     title = os.listdir(rf'{self.path}\history\battleSkill')
+        #     for i in title:
+        #         self.history_title.append(i.rstrip('.json'))
+        # else:
+        #     self.history_title.append(None)
+
+        self.history_title = self.statusController.get_history_title()
 
 
-    
     def get_support_title(self):
         self.support_type = ['all', 'saber', 'archer', 'lancer', 'rider', 'caster', 'assassin', 'berserker', 'other', 'mix']
-        self.supporter = {'all': list(), 'saber': list(), 'archer': list(), 'lancer': list(), 'rider': list(), 'caster': list(), 'assassin': list(), 'berserker': list(), 'other': list(), 'mix': list()}
-        # title = os.listdir(rf'.\img\Support\{type}')
+        self.support_character = {'all': list(), 'saber': list(), 'archer': list(), 'lancer': list(), 'rider': list(), 'caster': list(), 'assassin': list(), 'berserker': list(), 'other': list(), 'mix': list()}
+
         if os.path.isdir(rf'{self.path}\img\Support'):
             for i in self.support_type:
                 title = os.listdir(rf'{self.path}\img\Support\{i}')
                 for j in title:
-                    self.supporter[i].append(j.rstrip('.png'))
+                    self.support_character[i].append(j.rstrip('.png'))
         else:
             for i in self.support_type:
-                self.supporter[i].append(None)
+                self.support_character[i].append(None)
             print('No Supporter')
         print(self.path)
+
+
+    def exit(self):
+        print('view end')
+        sys.exit(0)

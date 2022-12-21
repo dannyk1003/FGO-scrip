@@ -52,6 +52,13 @@ class Visual:
             return None
 
     
+    def different_image_check(self, old, new):
+        if pyautogui.locate(old, new, confidence=0.95) != None:
+            return False
+        else:
+            return True
+
+    
     def WordToBlack(self, img):
 
         img = np.asarray(img)

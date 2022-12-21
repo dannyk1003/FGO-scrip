@@ -1,17 +1,14 @@
 import tkinter as tk
 from tkinter import ttk
-import sys
-import numpy as np
-# from Models.hwndModel import hwndModel
 
 
-class view3:
+class GetHwndView:
     def __init__(self, view):
         self.view = view
         self.root = tk.Tk()
         self.root.title('get hwnd')
         self.root.protocol('WM_DELETE_WINDOW', self.exit)
-        self.view3open = True
+        self.GetHwndViewOpen = True
         self.window_list = self.view.hwndController.get_window_list()
         self._make_combobox_and_innerWindows(self.window_list)
         self._make_button('Done')
@@ -84,5 +81,5 @@ class view3:
     
     def exit(self):
         # sys.exit(0)
-        self.view.view3open = False
+        self.view.GetHwndViewOpen = False
         self.root.destroy()
