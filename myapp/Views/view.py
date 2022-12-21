@@ -11,8 +11,9 @@ from Views.ReadHistoryView import ReadHistoryView
 
 
 class View:
-    def __init__(self, statusController, clickController, hwndController, path):
+    def __init__(self, statusController, clickController, hwndController, path, logger):
         self.path = path
+        self.logger = logger
 
         self.statusController = statusController
         self.clickController = clickController
