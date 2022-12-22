@@ -123,10 +123,14 @@ class View:
                 self.time = self.statusController.Times(func)
                 self.times.set(self.time)
             elif func == 'delete':
-                self.statusController.delete(self.now_history_name)
-                self.get_history_title()
-                self.history_title_combobox['values'] = self.history_title
-                self.history_title_combobox.set('')
+                deleteOrNot = tkinter.messagebox.askquestion('Prompt', 'Do you want to continue?')
+                if deleteOrNot == 'yes':
+                    self.statusController.delete(self.now_history_name)
+                    self.get_history_title()
+                    self.history_title_combobox['values'] = self.history_title
+                    self.history_title_combobox.set('')
+                else:
+                    print('dont delete')
             
 
         button_Text = tk.StringVar()
