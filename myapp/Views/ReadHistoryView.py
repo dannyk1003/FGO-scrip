@@ -7,17 +7,17 @@ class ReadHistoryView:
     def __init__(self, view):
         self.view = view
         self.root = tk.Tk()
-        self.root.title('Read History')
+        self.root.title(f'Read History - {self.view.now_history_name}')
         self.root.protocol('WM_DELETE_WINDOW', self.exit)
         self.ReadHistoryViewOpen = True
 
         self._support_area(0, 'support')
         self._make_label('Select your Battle Skill', 3, 0)
-        self._battle_area_ex('battle1', 4)
-        self._battle_area_ex('battle2', 13)
-        self._battle_area_ex('battle3', 22)
+        self._battle_area('battle1', 4)
+        self._battle_area('battle2', 13)
+        self._battle_area('battle3', 22)
         
-        self._make_Save_area(31, 0)
+        self._make_modify_area(31, 0)
         self._make_button('Done', 32, 3)
         
         
@@ -49,7 +49,16 @@ class ReadHistoryView:
             name = entry.get()
             if name == '':
                 tkinter.messagebox.showerror("Name Error", "Please enter a valid name")
-            self.view.statusController.modify(name)
+            elif name in self.view.history_title:
+                if name != self.view.now_history_name:
+                    tkinter.messagebox.showerror("Name Error", "duplicate name")
+                else:
+                    self.view.statusController.modify(self.view.now_history_name, name)
+                    self.view.history_title_combobox.set(name)
+            else:
+                self.view.statusController.modify(self.view.now_history_name, name)
+                self.view.history_title_combobox.set(name)
+
 
         entry = tk.Entry(self.root)
         entry.insert(0, self.view.now_history_name)
@@ -66,7 +75,7 @@ class ReadHistoryView:
 
             combobox_character['values'] = self.view.support_character[support_type]
             combobox_character.current(0)
-            print(self.view.supporter[support_type])
+            print(self.view.support_character[support_type])
             
         def supporter_func(event):
             support_character = combobox_character.get()
@@ -88,7 +97,7 @@ class ReadHistoryView:
         combobox_character.bind("<<ComboboxSelected>>", supporter_func)
 
 
-    def _battle_area_ex(self, battle, x):
+    def _battle_area(self, battle, x):
         p0 = 'player0' # clothes
         p1 = 'player1'
         p2 = 'player2'
@@ -130,48 +139,6 @@ class ReadHistoryView:
         self._make_label('', x+5, 0)
 
 
-    def _battle_area(self, text, battle, x):
-        p0 = 'player0' # clothes
-        p1 = 'player1'
-        p2 = 'player2'
-        p3 = 'player3'
-        to_who = ['None', p1, p2, p3]
-        s1 = 'skill1'
-        s2 = 'skill2'
-        s3 = 'skill3'
-
-        self._make_label(text, x, 0)
-        self._make_label('clothesS1', x+1, 0)
-        self._make_battle_combobox(to_who, battle, x+2, 0, p0, s1)
-        self._make_label('P1S1', x+1, 1)
-        self._make_battle_combobox(to_who, battle, x+2, 1, p1, s1)
-        self._make_label('P2S1', x+1, 2)
-        self._make_battle_combobox(to_who, battle, x+2, 2, p2, s1)
-        self._make_label('P3S1', x+1, 3)
-        self._make_battle_combobox(to_who, battle, x+2, 3, p3, s1)
-        self._make_label('clothesS2', x+3, 0)
-        self._make_battle_combobox(to_who, battle, x+4, 0, p0, s2)
-        self._make_label('P1S2', x+3, 1)
-        self._make_battle_combobox(to_who, battle, x+4, 1, p1, s2)
-        self._make_label('P2S2', x+3, 2)
-        self._make_battle_combobox(to_who, battle, x+4, 2, p2, s2)
-        self._make_label('P3S2', x+3, 3)
-        self._make_battle_combobox(to_who, battle, x+4, 3, p3, s2)
-        self._make_label('clothesS3', x+5, 0)
-        self._make_battle_combobox(to_who, battle, x+6, 0, p0, s3)
-        self._make_label('P1S3', x+5, 1)
-        self._make_battle_combobox(to_who, battle, x+6, 1, p1, s3)
-        self._make_label('P2S3', x+5, 2)
-        self._make_battle_combobox(to_who, battle, x+6, 2, p2, s3)
-        self._make_label('P3S3', x+5, 3)
-        self._make_battle_combobox(to_who, battle, x+6, 3, p3, s3)
-
-        self._make_label('Noble Phantasm', x+7, 0)
-        self._make_Noble_Phantasm_combobox(battle, p1, x+7, 1)
-        self._make_Noble_Phantasm_combobox(battle, p2, x+7, 2)
-        self._make_Noble_Phantasm_combobox(battle, p3, x+7, 3)
-        self._make_label('', x+8, 0)    
-
     def _make_label(self, text, x, y):
 
         label_Text = tk.StringVar()
@@ -190,18 +157,18 @@ class ReadHistoryView:
             self.view.now_status_skill.set(self.view.battleSkill)
 
         combobox = ttk.Combobox(self.root, state='readonly')
-        combobox['values'] = ['None', 'player1', 'player2', 'player3']
+        combobox['values'] = [None, 'player1', 'player2', 'player3']
         combobox.grid(row=x, column=y)
         k = battle[0] + battle[-1] + player[0] + player[-1] + skill[0] + skill[-1]
         current = self.view.battleSkill[k]
-        if current == None:
-            combobox.current(0)
-        elif current == 'player1':
+        if current == 'player1':
             combobox.current(1)
         elif current == 'player2':
             combobox.current(2)
-        else:
+        elif current == 'player3':
             combobox.current(3)
+        else:
+            combobox.current(0)
 
         combobox.bind("<<ComboboxSelected>>", combobox_func)
 
@@ -221,7 +188,8 @@ class ReadHistoryView:
     def exit(self):
         # sys.exit(0)
         self.view.ReadHistoryViewOpen = False
-        
+        self.view.get_history_title()
+        self.view.history_title_combobox['value'] = self.view.history_title
         self.root.destroy()
 
     

@@ -49,8 +49,8 @@ class statusController:
         return result
 
     
-    def modify(self, name):
-        self.model.modify_history(name)
+    def modify(self,old_name,  name):
+        self.model.modify_history(old_name, name)
 
 
     def delete(self, name):

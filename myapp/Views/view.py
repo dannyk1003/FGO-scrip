@@ -149,6 +149,7 @@ class View:
 
             elif text == 'Read History':
                 if self.ReadHistoryViewOpen == False:
+                    self.now_history_name = self.history_title_combobox.get()
                     if self.history_title_combobox.get() == '':
                         tkinter.messagebox.showerror("Name Error", "Please select a valid name")
                     else:
@@ -199,7 +200,7 @@ class View:
             self.now_history_name = title
             self.supporter = self.statusController.read_history(title)[0]
             self.battleSkill = self.statusController.read_history(title)[1]
-            print(type(self.statusController.read_history(title)))
+
             self.now_status_support.set(self.supporter)
             self.now_status_skill.set(self.battleSkill)
 

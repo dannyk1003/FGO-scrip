@@ -35,8 +35,10 @@ class BattleInformationView:
                 tkinter.messagebox.showerror("Name Error", "Please enter a valid name")
             elif name in self.view.history_title:
                 tkinter.messagebox.showerror("Name Error", "duplicate name")
-            self.view.statusController.Save(name)
-            self.view.get_history_title()
+            else:
+                self.view.statusController.Save(name)
+                self.view.get_history_title()
+                self.view.history_title_combobox.set(name)
 
         entry = tk.Entry(self.root)
         entry.grid(row=x+1, column=y)
@@ -188,7 +190,7 @@ class BattleInformationView:
         def battle_combobox_func(event):
             title = combobox.get()
             self.view.battleSkill = self.view.statusController.battle(title, battle, player, skill)
-            self.view.view.now_status_skill.set(self.view.battleSkill)
+            self.view.now_status_skill.set(self.view.battleSkill)
         
 
 

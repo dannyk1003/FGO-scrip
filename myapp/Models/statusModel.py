@@ -69,29 +69,13 @@ class statusModel:
 
         return self.battleSkill
 
-
-    def write_history(self, title):
-        with open(rf'{self.path}\history\battleSkill\{title}.json','w') as fw:
-            json.dump(self.battleSkill,fw)
-        with open(rf'{self.path}\history\Support\{title}.json','w') as fw:
-            json.dump(self.supporter,fw)
-    
-
-    def read_history(self, text):
-        with open(rf'{self.path}\history\battleSkill\{text}.json','r') as fr:
-            self.battleSkill = json.load(fr)
-        with open(rf'{self.path}\history\Support\{text}.json','r') as fr:
-            self.supporter = json.load(fr)
-        print(self.supporter, self.battleSkill)
-        return [self.supporter, self.battleSkill]
-
     
     def add_history(self, name):
         self.historyDB.insert(name, self.supporter, self.battleSkill)
 
 
-    def modify_history(self, name):
-        self.historyDB.delete(name)
+    def modify_history(self, old_name, name):
+        self.historyDB.delete(old_name)
         self.historyDB.insert(name, self.supporter, self.battleSkill)
 
 

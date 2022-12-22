@@ -51,7 +51,7 @@ class clickModel:
         if now_status_support != '':
             self.supporter = now_status_support
         else:
-            with open(rf'{self.path}\Configs\supporter_init.json','r') as fr:
+            with open(rf'{self.path}\Configs\support_init.json','r') as fr:
                 self.supporter = json.load(fr)
                 
         if now_status_skill != '':
@@ -84,6 +84,9 @@ class clickModel:
 
         if self.step == 0:
             self.go_again()
+            over_limit = self.over_limit()
+            if over_limit == True:
+                return 0
             ap = self.AP_recovery()
             if ap == False:
                 return 0
@@ -198,7 +201,7 @@ class clickModel:
                 clothes_position = self.Visual.locateOnImage('clothes')
                 while True:
                     if clothes_position != None:
-                        time.sleep(0.5)
+                        time.sleep(1.5)
                         # self.doClick(self.clothes)
                         self.sure_doClick(self.clothes)
                         time.sleep(1)
@@ -323,8 +326,13 @@ class clickModel:
                     yes_position = self.Visual.locateOnImage(rf"\Support\yes")
 
                     self.doClick(yes_position)
-                    time.sleep(1)
+                    time.sleep(5)
                     i = 0
+
+                    support_type_position = self.Visual.locateOnImage(rf"\Support\{self.supporter['type']}")
+
+                    self.doClick(support_type_position)
+
                 else:
                     self.doClick(go_down_position)
                     time.sleep(1)
@@ -381,6 +389,13 @@ class clickModel:
             else: # 有連續出擊
                 self.doClick(go_again_position) # 按連續出擊
                 break
+
+    
+    def over_limit(self):
+        over_limit_position = self.Visual.locateOnImage(rf"over_limit")
+        if over_limit_position != None:
+            print('over limit')
+            return True
 
 
     def AP_recovery(self):
