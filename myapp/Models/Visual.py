@@ -3,24 +3,21 @@ import numpy as np
 import time
 import pyautogui
 from PIL import Image, ImageQt
-from PyQt6.QtWidgets import QApplication
-import sys
+# from PyQt6.QtWidgets import QApplication
+# import sys
 
 
 class Visual:
-    def __init__(self, hwnd, innerHwnd, path):
+    def __init__(self, hwnd, innerHwnd, path, app):
         self.path = path
         self.hwnd = hwnd
         self.innerHwnd = innerHwnd
-        self.app = QApplication(sys.argv)
+        self.app = app
 
 
     def get_image(self):
-        print('get_image')
         screen = self.app.primaryScreen()
         img = screen.grabWindow(self.innerHwnd).toImage()
-        # print(type(img))
-        # print(img)
         self.screenShot = ImageQt.fromqimage(img)
         return self.screenShot
     
@@ -43,6 +40,7 @@ class Visual:
 
 
     def locateOnImage(self, item):
+        print('locate ', item, ' on screen')
 
         self.get_900_506_image()
         if pyautogui.locate(rf'{self.path}\img\{item}.png', self.screenShot, confidence=0.95) != None:
@@ -79,9 +77,22 @@ class Visual:
         return imgToBlack
     
     
-    def image_cut(self, img, x_start, y_start, x_end, y_end): # 620, 0, 633, 30 這個位置是battle幾
+    def image_cut(self, img, x_start, y_start, x_end, y_end): # 620, 0, 633, 30 這個位置是battle幾 # 600, 200, 800, 250 這個位置是 clothes 技能位置
         new_img = img.crop((x_start, y_start, x_end, y_end))  # (left, upper, right, lower)
         return new_img
     
+
+    def image_pixel(self,img, x, y):
+        color = img.getpixel((x, y))
+        return color
+
+
+    def get_pixel(self, position):
+        img = self.get_900_506_image()
+        x = position[0]
+        y = position[1]
+        color = img.getpixel((x, y))
+
+        return color
 
     

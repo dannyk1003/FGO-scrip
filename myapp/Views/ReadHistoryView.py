@@ -19,34 +19,18 @@ class ReadHistoryView:
         
         self._make_modify_area(31, 0)
         self._make_button('Done', 32, 3)
+        self._make_button('Cancel', 32, 4)
         
         
     def main(self):
         self.root.mainloop()
         print('ReadHistoryView end')
 
-    def _make_Save_area(self, x, y):
-        self._make_label('Remember me', x, 0)
-        def button_event():
-            print('func')
-            print(entry.get())
-            print(entry)
-            if entry.get() != '':
-                text = entry.get()
-                print(text)
-                self.view.statusController.Save(text)
-
-        entry = tk.Entry(self.root)
-        entry.insert(0, self.view.now_history_name)
-        entry.grid(row=x+1, column=y)
-
-        myButton = tk.Button(self.root, text = 'modify', command=button_event)
-        myButton.grid(row=x+1, column=y+1)
-
     
     def _make_modify_area(self, x, y):
+        self._make_label('Modify me', x, 0)
         def button_event():
-            name = entry.get()
+            name = self.entry.get()
             if name == '':
                 tkinter.messagebox.showerror("Name Error", "Please enter a valid name")
             elif name in self.view.history_title:
@@ -60,12 +44,12 @@ class ReadHistoryView:
                 self.view.history_title_combobox.set(name)
 
 
-        entry = tk.Entry(self.root)
-        entry.insert(0, self.view.now_history_name)
-        entry.grid(row=x+1, column=y)
+        self.entry = tk.Entry(self.root)
+        self.entry.insert(0, self.view.now_history_name)
+        self.entry.grid(row=x+1, column=y)
 
-        myButton = tk.Button(self.root, text = 'modify', command=button_event)
-        myButton.grid(row=x+1, column=y+1)
+        # myButton = tk.Button(self.root, text = 'modify', command=button_event)
+        # myButton.grid(row=x+1, column=y+1)
 
     
     def _support_area(self, x, func):
@@ -75,6 +59,8 @@ class ReadHistoryView:
 
             combobox_character['values'] = self.view.support_character[support_type]
             combobox_character.current(0)
+            self.view.supporter = self.view.statusController.support([combobox_type.get(), combobox_character.get()])
+            self.view.now_status_support.set(self.view.supporter)
             print(self.view.support_character[support_type])
             
         def supporter_func(event):
@@ -102,7 +88,6 @@ class ReadHistoryView:
         p1 = 'player1'
         p2 = 'player2'
         p3 = 'player3'
-        to_who = ['None', p1, p2, p3]
         s1 = 'skill1'
         s2 = 'skill2'
         s3 = 'skill3'
@@ -157,7 +142,7 @@ class ReadHistoryView:
             self.view.now_status_skill.set(self.view.battleSkill)
 
         combobox = ttk.Combobox(self.root, state='readonly')
-        combobox['values'] = [None, 'player1', 'player2', 'player3']
+        combobox['values'] = ['None', 'player1', 'player2', 'player3']
         combobox.grid(row=x, column=y)
         k = battle[0] + battle[-1] + player[0] + player[-1] + skill[0] + skill[-1]
         current = self.view.battleSkill[k]
@@ -176,7 +161,30 @@ class ReadHistoryView:
     def _make_button(self, text, x, y):
 
         def button_event():
-            self.exit()
+            if text == 'Done':
+                name = self.entry.get()
+                if name == '':
+                    tkinter.messagebox.showerror("Name Error", "Please enter a valid name")
+
+                elif name in self.view.history_title:
+                    if name != self.view.now_history_name:
+                        tkinter.messagebox.showerror("Name Error", "duplicate name")
+
+                    else:
+                        self.view.statusController.modify(self.view.now_history_name, name)
+                        self.view.history_title_combobox.set(name)
+                        self.exit()
+
+                else:
+                    self.view.statusController.modify(self.view.now_history_name, name)
+                    self.view.history_title_combobox.set(name)
+                    self.exit()
+
+                
+
+            elif text == 'Cancel':
+                self.view.set_current_status()
+                self.exit()
             
 
         button_Text = tk.StringVar()

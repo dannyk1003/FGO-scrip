@@ -7,16 +7,18 @@ import json
 from Models.Visual import Visual
 
 
+
 class clickModel:
-    def __init__(self, path):
+    def __init__(self, path, app):
         self.path = path
+        self.app = app
 
         self.times = 0
         self.hwnd = ''
         self.innerHwnd = ''
         self.connect = ''
         
-        self.apple = None
+        self.apple = 'None'
 
 
     def doClick(self, position):
@@ -27,10 +29,46 @@ class clickModel:
         long_position = win32api.MAKELONG(int(x), int(y)) 
         win32gui.SendMessage(hwnd, win32con.WM_ACTIVATE, win32con.WA_ACTIVE, 0)
         win32gui.PostMessage(hwnd, win32con.WM_LBUTTONDOWN, win32con.MK_LBUTTON, long_position)
-        time.sleep(0.5)
+        # time.sleep(0.5)
         win32gui.SendMessage(hwnd, win32con.WM_ACTIVATE, win32con.WA_ACTIVE, 0)
         win32gui.PostMessage(hwnd, win32con.WM_LBUTTONUP, win32con.MK_LBUTTON, long_position)
         time.sleep(0.5)
+
+    
+    def doClick_pixel(self, position):
+        before_img = self.Visual.get_900_506_image()
+        x = position[0]
+        y = position[1]
+        before_pixel = self.Visual.image_pixel(before_img, x, y)
+
+        self.doClick(position)
+        time.sleep(1)
+
+        after_img = self.Visual.get_900_506_image()
+        after_pixel = self.Visual.image_pixel(after_img, x, y)
+
+        while before_pixel == after_pixel:
+            time.sleep(1)
+            self.doClick(position)
+
+            after_img = self.Visual.get_900_506_image()
+            after_pixel = self.Visual.image_pixel(after_img, x, y)
+
+    
+    def doClick_cutImage(self, position, x_start, y_start, x_end, y_end):
+        def click_check(before, after):
+            return self.Visual.different_image_check(before, after)
+
+        before = self.Visual.get_900_506_image()
+        before_cut = self.Visual.image_cut(before, x_start, y_start, x_end, y_end)
+        while True:
+            self.doClick(position)
+            time.sleep(1)
+            after = self.Visual.get_900_506_image()
+            after_cut = self.Visual.image_cut(after, x_start, y_start, x_end, y_end)
+            if click_check(before_cut, after_cut):
+                break
+            time.sleep(1)
 
 
     def window_to_front(self):
@@ -45,7 +83,7 @@ class clickModel:
         self.innerHwnd = innerHwnd
         self.apple = apple
 
-        self.Visual = Visual(self.hwnd, self.innerHwnd, self.path)
+        self.Visual = Visual(self.hwnd, self.innerHwnd, self.path, self.app)
         
         self.position()
         if now_status_support != '':
@@ -82,31 +120,36 @@ class clickModel:
 
     def runScrip(self):
 
-        if self.step == 0:
-            self.go_again()
-            over_limit = self.over_limit()
-            if over_limit == True:
-                return 0
-            ap = self.AP_recovery()
-            if ap == False:
-                return 0
-            self.select_support()
-            self.step += 1
-        
-        if  self.step == 1:
-            self.Battle(1)
-            self.step += 1
+        while self.step != 4:
+            if self.step == 0:
+                self.go_again()
 
-        if  self.step == 2:
-            self.Battle(2)
-            self.step += 1
+            if self.step == 0:
+                self.over_limit()
 
-        if  self.step == 3:
-            self.Battle(3)
-            self.step += 1
+            if self.step == 0:
+                self.AP_recovery()
+
+            if self.step == 0:
+                self.select_support()
+                self.step += 1
             
-        print('battle end')
-        self.step = 0       
+            if  self.step == 1:
+                self.Battle(1)
+                self.step += 1
+
+            if  self.step == 2:
+                self.Battle(2)
+                self.step += 1
+
+            if  self.step == 3:
+                self.Battle(3)
+                self.step += 1
+            
+            if self.step == 4:
+                print('battle end')
+                self.step = 0
+                break   
     
 
     def position(self):
@@ -134,7 +177,7 @@ class clickModel:
 
 
     def Battle(self, n): # battle n
-        self.main_screen()        
+        self.main_screen(5)        
         print('now is battle', n)
 
         while True:
@@ -148,13 +191,16 @@ class clickModel:
                 for i in range(4):
                     for j in range(1, 4, 1):
                         p = 'b' + str(n) + 'p' + str(i) + 's' + str(j)
-                        print(p)
-                        self.useSkill(i, j, self.battleSkill[p])
+                        m = self.battleSkill[p]
+
+                        if m != 'None':
+                            self.useSkill(i, j, m)
+                            time.sleep(1)
 
                 while True:
-                    self.main_screen()
+                    self.main_screen(5)
                     self.useAttack(n)
-                    self.main_screen()
+                    self.main_screen(5)
                     battle_count_position = self.CheckBattleCount(n)
                     with_servant_connect_position = self.Visual.locateOnImage('with_servant_connect')
 
@@ -168,7 +214,7 @@ class clickModel:
 
     
     def endBattle(self):
-        if self.main_screen() == 'with_servant_connect':
+        if self.main_screen(5) == 'with_servant_connect':
             while True:
                 with_servant_connect_position = self.Visual.locateOnImage('with_servant_connect')
                 self.doClick(with_servant_connect_position)
@@ -178,7 +224,7 @@ class clickModel:
 
 
 
-    def main_screen(self):
+    def main_screen(self, t):
         clothes_position = self.Visual.locateOnImage('clothes')
         with_servant_connect_position = self.Visual.locateOnImage('with_servant_connect')
 
@@ -188,13 +234,13 @@ class clickModel:
             elif with_servant_connect_position != None: # 畫面上有 '與從者的羈絆'
                 return 'with_servant_connect'
             else:
-                time.sleep(5)
+                time.sleep(t)
                 clothes_position = self.Visual.locateOnImage('clothes')
                 with_servant_connect_position = self.Visual.locateOnImage('with_servant_connect')
 
 
-    def useSkill(self, p, n, m): # player p 的第 n 個技能, 給player m
-        if m != None:
+    def useSkill_(self, p, n, m): # player p 的第 n 個技能, 給player m
+        if m != 'None':
             player = 'p' + str(p) + 's' + str(n)
             print(player)
             if p == 0:
@@ -228,6 +274,108 @@ class clickModel:
                     self.sure_doClick(self.toPlayer[m])
                 time.sleep(4)
 
+    
+    def useSkill(self, p, n, m):
+        if m != 'None':
+
+            if p == 0:
+                self.useClothesSkill(n, m)
+
+            else:
+                self.usePlayerSkill(p, n, m)
+        print('finish one skill')
+
+    
+    def useClothesSkill(self, n, m):
+        player = 'p0s' + str(n)
+
+        self.main_screen(2)
+        print('click clothes')
+        time.sleep(2)
+        self.doClick_cutImage(self.clothes, 600, 200, 800, 250)
+        time.sleep(2)
+
+        # self.doClick_pixel(self.playerSkill[player])
+        self.doClick(self.playerSkill[player])
+        time.sleep(4)
+
+        # while True:
+
+        if self.please_select_object() != None:
+            self.sure_doClick(self.toPlayer[m])
+            # break
+
+        elif self.skill_used_check() != None:
+            self.sure_doClick(self.skill_used_check())
+            self.doClick_cutImage(self.clothes, 600, 200, 800, 250)
+            # break
+
+            # else:
+            #     self.doClick_cutImage(self.playerSkill[player], 600, 200, 800, 250)
+            #     time.sleep(2)
+        
+
+    def usePlayerSkill(self, p, n, m):
+        player = 'p' + str(p) + 's' + str(n)
+
+        self.main_screen(2)
+        before_pixel = self.position_pixel(self.playerSkill[player])
+        self.doClick(self.playerSkill[player])
+        time.sleep(2)
+        after_pixel = self.position_pixel(self.playerSkill[player])
+
+        while True:
+
+            if self.please_select_object() != None:
+                self.sure_doClick(self.toPlayer[m])
+                break
+
+            elif self.skill_used_check() != None:
+                self.sure_doClick(self.skill_used_check())
+                break
+
+            elif before_pixel != after_pixel:
+                break
+
+            else:
+                self.doClick(self.playerSkill[player])
+                time.sleep(2)
+                after_pixel = self.position_pixel(self.playerSkill[player])
+
+
+    
+    def please_select_object(self):
+        Please_select_object_position = self.Visual.locateOnImage('Please_select_object')
+        if Please_select_object_position != None:
+            return Please_select_object_position
+        else:
+            return None
+    
+
+    def skill_used_check(self):
+        # Now = self.Visual.get_900_506_image()
+        # cancel = rf'{self.path}\img\cancel.png'
+
+        cancel_position = self.Visual.locateOnImage('cancel')
+        if cancel_position != None:
+            return cancel_position
+        else:
+            return None
+
+        # if pyautogui.locate(cancel, Now, confidence=0.8) != None :
+        #     print(pyautogui.locate(cancel, Now, confidence=0.8))
+        #     x = pyautogui.locate(cancel, Now, confidence=0.8)[0]
+        #     y = pyautogui.locate(cancel, Now, confidence=0.8)[1]
+        #     return [x, y]
+        # else:
+        #     return None
+
+
+    def position_pixel(self, position):
+        pixel = self.Visual.get_pixel(position)
+        return pixel
+
+        
     def useAttack(self, n):
         self.position()
 
@@ -235,21 +383,29 @@ class clickModel:
         p2np = 'b' + str(n) + 'p2NP'
         p3np = 'b' + str(n) + 'p3NP'
         np_list = [self.battleSkill[p1np], self.battleSkill[p2np],self.battleSkill[p3np]]
+     
 
-
-        self.doClick(self.attack)
-        time.sleep(2)
-        
-        for i, p in enumerate(np_list):
-            if p == 'ON':
-                self.doClick(self.big[i])
-                time.sleep(2)
-
-        for j in range(3):
-            self.doClick(self.small[j])
+        while True:
+            self.doClick(self.attack)
             time.sleep(2)
         
-        time.sleep(20)
+            for i, p in enumerate(np_list):
+                if p == 'ON':
+                    self.doClick(self.big[i])
+                    time.sleep(1)
+
+            for j in range(3):
+                self.doClick(self.small[j])
+                time.sleep(1)
+            
+            go_back = self.wait_until('go_back', 5, 1)
+            if go_back != None:
+                self.sure_doClick(go_back)
+                time.sleep(2)
+
+            else:
+                time.sleep(10)
+                break
 
     
     def CheckBattleCount(self, count):
@@ -268,19 +424,6 @@ class clickModel:
             return None
         
 
-    def skill_used_check(self):
-        Now = self.Visual.get_900_506_image()
-        cancel = rf'{self.path}\img\cancel.png'
-
-        if pyautogui.locate(cancel, Now, confidence=0.8) != None :
-            print(pyautogui.locate(cancel, Now, confidence=0.8))
-            x = pyautogui.locate(cancel, Now, confidence=0.8)[0]
-            y = pyautogui.locate(cancel, Now, confidence=0.8)[1]
-            return [x, y]
-        else:
-            return None
-
-    
     def select_support(self):
         while True:
             time.sleep(2)
@@ -308,7 +451,7 @@ class clickModel:
             self.doClick(supporter_position)
         else:
             i = 0
-            while i != 10:
+            while i != 5:
                 i += 1
                 # go_down_position = self.locateOnImage(rf"\Support\go_down", 'ScreenShot')
 
@@ -335,7 +478,7 @@ class clickModel:
 
                 else:
                     self.doClick(go_down_position)
-                    time.sleep(1)
+                    time.sleep(2)
                 
                 # supporter_position = self.locateOnImage(rf"\Support\{self.supporter['type']}\{self.supporter['supporter']}", 'ScreenShot')
 
@@ -395,35 +538,45 @@ class clickModel:
         over_limit_position = self.Visual.locateOnImage(rf"over_limit")
         if over_limit_position != None:
             print('over limit')
+            self.step = 4
             return True
 
 
     def AP_recovery(self):
 
-        gold_position = self.Visual.locateOnImage(rf"\AP_Recovery\gold")
+        AP_position = self.Visual.locateOnImage(rf"\AP_Recovery\AP")
 
-        if gold_position != None:
-            if self.apple == None:
-                return False
-            while True:
-                apple_position = self.Visual.locateOnImage(rf"\AP_Recovery\{self.apple}")
-
-                if apple_position != None:
-                    self.doClick(apple_position)
+        if AP_position != None:
+            if self.apple == 'None':
+                self.step = 4
+            
+            else:
+                go_down_position = self.wait_until(rf"\AP_Recovery\go_down", 5, 1)
+                if go_down_position != None:
+                    self.sure_doClick(go_down_position)
                     time.sleep(1)
 
-                    sure_position = self.Visual.locateOnImage(rf"\AP_Recovery\sure")
-
-                    self.doClick(sure_position)
-                    break
-
+                    apple_position = self.Visual.locateOnImage(rf"\AP_Recovery\{self.apple}")
+                    if apple_position != None:
+                        self.sure_doClick(apple_position)
+                        sure_position = self.wait_until(rf"\AP_Recovery\sure", 10, 1)
+                        self.sure_doClick(sure_position)
+                
                 else:
-                    go_down_position = self.Visual.locateOnImage(rf"\AP_Recovery\go_down")
+                    self.step = 0
 
-                    self.doClick(go_down_position)
-                    time.sleep(1)
+        
+    def wait_until(self, item, n, t):
+        item_position = self.Visual.locateOnImage(item)
 
-
+        for i in range(n):
+            if item_position != None:
+                return item_position
+            else:
+                time.sleep(t)
+                item_position = self.Visual.locateOnImage(item)
+        
+        return None
 
 
     def sure_doClick(self, position):
@@ -440,69 +593,11 @@ class clickModel:
                 break
             time.sleep(1)
 
-'''
-
-    def WordToBlack(self, before, after):
-        img = cv2.imread(before)
-
-        imgToBlack = np.array(img)
-        for i in range(len(img)):
-            for j in range(len(img[i])):
-                if (img[i][j][0] == img[i][j][1]) & (img[i][j][1] == img[i][j][2]) & (img[i][j][0] >= 80):
-                    imgToBlack[i][j][0] = 0
-                    imgToBlack[i][j][1] = 0
-                    imgToBlack[i][j][2] = 0
-                else:
-                    imgToBlack[i][j][0] = 255
-                    imgToBlack[i][j][1] = 255
-                    imgToBlack[i][j][2] = 255
-
-        cv2.imwrite(after, imgToBlack)
-
-
-    def image_cut(self, before, after, x_start, y_start, x_end, y_end): # 620, 0, 633, 30 這個位置是battle幾
-        img = Image.open(before)
-        new_img = img.crop((x_start, y_start, x_end, y_end))  # (left, upper, right, lower)
-        new_img.save(after)
-
-
-    def SizeTest(self, text):
-        img = Image.open(rf'{self.path}\img\screenShot\{text}.png')
-        # img = self.screenShot
-        return img.size
-
-
-    def get_image(self, text):
-        app = QApplication(sys.argv)
-        screen = QApplication.primaryScreen()
-        img = screen.grabWindow(self.innerHwnd).toImage()
-        img.save(rf'{self.path}\img\screenShot\{text}.png')
-        # self.screenShot = ImageQt.fromqimage(img)
-
-        return rf'{self.path}\img\screenShot\{text}.png'
-
-
-    def get_900_506_image(self, text):
-        self.get_image(text)
-        while True:
-            if self.SizeTest(text) != (900, 506):
-                win32gui.MoveWindow(self.hwnd, True, True, 934, 540, True)
-                time.sleep(0.5)
-                self.get_image(text)
-            else:
-                break
-        return rf'{self.path}\img\screenShot\{text}.png'
-
     
-    def locateOnImage(self, item, image):
+    def no_control(self, innerHwnd):
+        win32gui.EnableWindow(innerHwnd, False)
+        print('F')
 
-        self.get_900_506_image(image)
-        if pyautogui.locate(rf'{self.path}\img\{item}.png', rf'{self.path}\img\screenShot\{image}.png', confidence=0.95) != None:
-            # x = pyautogui.locate(rf'img\{item}.png', rf'img\screenShot\{image}.png', confidence=0.95)[0]
-            # y = pyautogui.locate(rf'img\{item}.png', rf'img\screenShot\{image}.png', confidence=0.95)[1]
-            x, y = pyautogui.center(pyautogui.locate(rf'{self.path}\img\{item}.png', rf'{self.path}\img\screenShot\{image}.png', confidence=0.95))
-            return [x, y]
-        else:
-            return None
-
-'''
+    def control(self, innerHwnd):
+        win32gui.EnableWindow(innerHwnd, True)
+        print('T')

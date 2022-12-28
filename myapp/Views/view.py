@@ -21,19 +21,20 @@ class View:
         self.root = tk.Tk()
 
         self.times = tk.StringVar()
-        self.connection = tk.StringVar()
+        self.get_hwnd_label = tk.StringVar()
         self.history_name = tk.StringVar()
         self.now_status_skill = tk.StringVar()
         self.now_status_support = tk.StringVar()
         self.supporter = ''
         self.battleSkill = ''
         self.time = 0
+        self.connection = ''
         self.BattleInformationViewOpen = False
         self.ReadHistoryViewOpen = False
         self.GetHwndViewOpen = False
         self.get_history_title()
         self.get_support_title()
-        self.apple = None
+        self.apple = 'None'
 
         self.window = 'BlueStacks App Player'
         self.innerWindow = 'Qt5154QWindowIcon'
@@ -41,7 +42,7 @@ class View:
         self.innerHwnd = ''
 
         self.root.title('FGO Scrip')
-        self.root.geometry('1000x800')
+        self.root.geometry('800x600')
 
         self.root.protocol('WM_DELETE_WINDOW', self.exit)
         
@@ -57,7 +58,8 @@ class View:
         self._make_label('Start&End', 0, 0)
         self._make_button('get hwnd', 'get_hwnd', 1, 0)
         self._make_get_hwnd_label(1, 1)
-        self._make_button('Start', 'start', 1, 2)
+        # self._make_button('Start', 'start', 1, 2)
+        self._make_start_button(1, 2)
         self._make_button('End', 'end', 1, 3)
         self._make_label('Times', 2, 0)
         self._make_times_label(3, 0)
@@ -73,6 +75,8 @@ class View:
 
         self._make_label('AP Recovery', 4, 2)
         self._make_apple_combobox(29, 2)
+
+        # self._make_button('abc', 'abc', 29, 3)
 
         self._make_history_title_combobox(29, 0)
         self._make_button('delete', 'delete', 29, 1)
@@ -91,17 +95,37 @@ class View:
         frm = ttk.Frame(self.main_frm)
         frm.pack()
 
+    
+    def _make_start_button(self, x, y):
+        def button_event():
+            if self.connection == '' or self.connection == 'Fail':
+                tkinter.messagebox.showerror("Connect Error", "Please press get hwnd!")
+
+            elif self.connection == 'Success':
+                    if self.history_title_combobox.get() == '':
+                        tkinter.messagebox.showerror("History Error", "Please select history!")
+                    
+                    else:
+                        self.set_current_status()
+                        self.clickController.start(self.supporter, self.battleSkill, self.apple, self.time, self.hwnd, self.innerHwnd)
+            
+
+        button = ttk.Button(self.root, text='Start', command=button_event)
+        button.grid(row=x, column=y)
+
 
     def _make_button(self, text, func, x, y):
 
         def button_event():
             print(func)
             if func == 'get_hwnd':
-                connection = self.hwndController.connection(self.window, self.innerWindow)
-                hwnd = self.hwndController.get_hwnd(self.window)
-                self.connection.set(connection)
-                print(connection)
-                if connection == 'Fail':
+                self.connection = self.hwndController.connection(self.window, self.innerWindow)
+                self.hwnd = self.hwndController.get_hwnd(self.window)
+                self.innerHwnd = self.hwndController.get_inner_hwnd(self.window, self.innerWindow)
+                self.get_hwnd_label.set(self.connection)
+                print(self.connection)
+
+                if self.connection == 'Fail':
                     if self.GetHwndViewOpen == False:
                         self.GetHwndViewOpen = True
                         GetHwndView(self).main()
@@ -109,28 +133,41 @@ class View:
             elif func == 'Times':
                 self.time = self.statusController.Times(text)
                 self.times.set(self.time)
+
             elif func == 'Save':
                 self.get_history_title()
+
             elif func == 'start':
-                connection = self.hwndController.connection(self.window, self.innerWindow)
-                self.connection.set(connection)
-                if connection == 'Success':
-                    self.hwnd = self.hwndController.get_hwnd(self.window)
-                    self.innerHwnd = self.hwndController.get_inner_hwnd(self.window, self.innerWindow)
+                if self.connection == '' or self.connection == 'Fail':
+                    tkinter.messagebox.showerror("Connect Error", "Please press get hwnd!")
+                # connection = self.hwndController.connection(self.window, self.innerWindow)
+                # self.get_hwnd_label.set(connection)
+
+                elif self.connection == 'Success':
+                    # self.hwnd = self.hwndController.get_hwnd(self.window)
+                    # self.innerHwnd = self.hwndController.get_inner_hwnd(self.window, self.innerWindow)
                     self.clickController.start(self.supporter, self.battleSkill, self.apple, self.time, self.hwnd, self.innerHwnd)
+
             elif func == 'end':
                 self.clickController.end()
                 self.time = self.statusController.Times(func)
                 self.times.set(self.time)
+
             elif func == 'delete':
                 deleteOrNot = tkinter.messagebox.askquestion('Prompt', 'Do you want to continue?')
+
                 if deleteOrNot == 'yes':
                     self.statusController.delete(self.now_history_name)
                     self.get_history_title()
                     self.history_title_combobox['values'] = self.history_title
                     self.history_title_combobox.set('')
+                    self.set_current_status()
+
                 else:
                     print('dont delete')
+            
+            elif func == 'abc':
+                self.clickController.control(self.innerHwnd)
             
 
         button_Text = tk.StringVar()
@@ -139,6 +176,22 @@ class View:
         button.grid(row=x, column=y)
 
     
+    def set_current_status(self):
+        if self.history_title_combobox.get() == '':
+            self.supporter = ''
+            self.battleSkill = ''
+            self.now_status_support.set(self.supporter)
+            self.now_status_skill.set(self.battleSkill)
+
+        else:
+            self.now_history_name = self.history_title_combobox.get()
+            self.supporter = self.statusController.read_history(self.now_history_name)[0]
+            self.battleSkill = self.statusController.read_history(self.now_history_name)[1]
+
+            self.now_status_support.set(self.supporter)
+            self.now_status_skill.set(self.battleSkill)
+        
+
     def _to_another_view(self, text, x, y):
         def button_event():
             if text == 'Battle Information':
@@ -157,7 +210,6 @@ class View:
                         ReadHistoryView(self).main()
                         print('view: ReadHistoryView end')
                 
-            
 
         button_Text = tk.StringVar()
         button = ttk.Button(self.root, text=button_Text, command=button_event)
@@ -180,7 +232,7 @@ class View:
 
 
     def _make_get_hwnd_label(self, x, y):
-        get_hwnd = ttk.Entry(self.root, textvariable=self.connection, state='disabled')
+        get_hwnd = ttk.Entry(self.root, textvariable=self.get_hwnd_label, state='disabled')
         get_hwnd.grid(row=x, column=y)
 
 
@@ -196,13 +248,7 @@ class View:
 
     def _make_history_title_combobox(self, x, y):
         def combobox_func(event):
-            title = self.history_title_combobox.get()
-            self.now_history_name = title
-            self.supporter = self.statusController.read_history(title)[0]
-            self.battleSkill = self.statusController.read_history(title)[1]
-
-            self.now_status_support.set(self.supporter)
-            self.now_status_skill.set(self.battleSkill)
+            self.set_current_status()
 
 
         self.history_title_combobox = ttk.Combobox(self.root, state='readonly', values=self.history_title)
@@ -233,13 +279,6 @@ class View:
 
 
     def get_history_title(self):
-        # self.history_title = list()
-        # if os.path.isdir(rf'{self.path}\history\battleSkill'):
-        #     title = os.listdir(rf'{self.path}\history\battleSkill')
-        #     for i in title:
-        #         self.history_title.append(i.rstrip('.json'))
-        # else:
-        #     self.history_title.append(None)
 
         self.history_title = self.statusController.get_history_title()
 
@@ -255,7 +294,7 @@ class View:
                     self.support_character[i].append(j.rstrip('.png'))
         else:
             for i in self.support_type:
-                self.support_character[i].append(None)
+                self.support_character[i].append('None')
             print('No Supporter')
         print(self.path)
 
@@ -273,7 +312,7 @@ class View:
 
 
         combobox = ttk.Combobox(self.root, state='readonly')
-        combobox['values'] = [None, 'Gold', 'Silver', 'Bronze', 'Stone']
+        combobox['values'] = ['None', 'Gold', 'Silver', 'Bronze']
         combobox.current(0)
         combobox.grid(row=x, column=y)
         combobox.bind("<<ComboboxSelected>>", combobox_func)     

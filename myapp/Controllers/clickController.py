@@ -8,9 +8,9 @@ import ctypes
 from Models.clickModel import clickModel
 
 class clickController:
-    def __init__(self, path):
+    def __init__(self, path, app):
         self.path = path
-        self.model = clickModel(path)
+        self.model = clickModel(path, app)
         self.thread_start = 'No'
 
     
@@ -59,6 +59,16 @@ class clickController:
         self.thread_start = 'No'
         print('success')
         tkinter.messagebox.showinfo("Info", "Scrip End")
+    
+    def control(self, innerHwnd):
+        print(innerHwnd)
+        self.control_set = True
+        if self.control_set == True:
+            self.model.no_control(innerHwnd)
+            self.control_set = False
+        else:
+            self.model.control(innerHwnd)
+            self.control_set = True
 
         
     

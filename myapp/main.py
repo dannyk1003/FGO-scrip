@@ -1,5 +1,7 @@
 from Logs.log import getLog
-import os
+import os, sys
+from PyQt6.QtWidgets import QApplication
+app = QApplication(sys.argv)
 
 print(os.path.dirname(os.path.realpath(__file__)))
 
@@ -19,7 +21,7 @@ try:
         from Views.view import View
 
         logger.returnLog().info('main start')
-        FGO_view = View(statusController(path), clickController(path), hwndController(path), path, logger)
+        FGO_view = View(statusController(path), clickController(path, app), hwndController(path), path, logger)
         FGO_view.main()
         logger.returnLog().info('main end')
 
