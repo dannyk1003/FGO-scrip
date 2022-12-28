@@ -462,7 +462,7 @@ class clickModel:
 
                     re_new_list_position = self.Visual.locateOnImage(rf"\Support\re_new_list")
 
-                    self.doClick(re_new_list_position)
+                    self.sure_doClick(re_new_list_position)
                     time.sleep(1)
                     # yes_position = self.locateOnImage(rf"\Support\yes", 'ScreenShot')
 
