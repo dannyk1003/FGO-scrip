@@ -425,6 +425,8 @@ class clickModel:
         
 
     def select_support(self):
+        old_type = self.supporter['type']
+        old_character = self.supporter['character']
         while True:
             time.sleep(2)
             # support_choose_position = self.locateOnImage(rf"\Support\support_choose", 'ScreenShot')
@@ -461,8 +463,7 @@ class clickModel:
                 if go_down_position == None or i == 5:
                     k += 1
                     if k == 3:
-                        old_type = self.supporter['type']
-                        old_character = self.supporter['character']
+                        
                         self.supporter['type'] = 'all'
                         self.supporter['character'] = 'Random'
                     # re_new_list_position = self.locateOnImage(rf"\Support\re_new_list", 'ScreenShot')
