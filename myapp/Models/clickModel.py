@@ -451,13 +451,20 @@ class clickModel:
             self.doClick(supporter_position)
         else:
             i = 0
-            while i != 5:
+            k = 0
+            while True:
                 i += 1
                 # go_down_position = self.locateOnImage(rf"\Support\go_down", 'ScreenShot')
 
                 go_down_position = self.Visual.locateOnImage(rf"\Support\go_down")
 
-                if go_down_position == None:
+                if go_down_position == None or i == 5:
+                    k += 1
+                    if k == 3:
+                        old_type = self.supporter['type']
+                        old_character = self.supporter['character']
+                        self.supporter['type'] = 'all'
+                        self.supporter['character'] = 'Random'
                     # re_new_list_position = self.locateOnImage(rf"\Support\re_new_list", 'ScreenShot')
 
                     re_new_list_position = self.Visual.locateOnImage(rf"\Support\re_new_list")
@@ -505,7 +512,9 @@ class clickModel:
                 time.sleep(0.5)
                 mission_start_position = self.Visual.locateOnImage(rf"\Support\mission_start")
                 clothes_position = self.Visual.locateOnImage('clothes')
-        
+
+        self.supporter['type'] = old_type
+        self.supporter['character'] = old_character
         print('select end')
 
 

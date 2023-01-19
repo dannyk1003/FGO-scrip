@@ -67,9 +67,9 @@ class historyDB:
         )
 
         for row in cursor:
-            print ("name = ", row[0])
-            print ("Support = ", row[1])
-            print ("battleSkill = ", row[2], "\n")
+            # print ("name = ", row[0])
+            # print ("Support = ", row[1])
+            # print ("battleSkill = ", row[2], "\n")
             # DB_data.append({'name': row[0], 'Support': row[1], 'battleSkill': row[2]})
             DB_data.update({row[0]:{'Support': row[1], 'battleSkill': row[2]}})
 

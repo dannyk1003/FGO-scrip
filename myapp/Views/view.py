@@ -20,11 +20,7 @@ class View:
         self.hwndController = hwndController
         self.root = tk.Tk()
 
-        self.times = tk.StringVar()
-        self.get_hwnd_label = tk.StringVar()
-        self.history_name = tk.StringVar()
-        self.now_status_skill = tk.StringVar()
-        self.now_status_support = tk.StringVar()
+        self._make_stringVar()
         self.supporter = ''
         self.battleSkill = ''
         self.time = 0
@@ -32,6 +28,7 @@ class View:
         self.BattleInformationViewOpen = False
         self.ReadHistoryViewOpen = False
         self.GetHwndViewOpen = False
+
         self.get_history_title()
         self.get_support_title()
         self.apple = 'None'
@@ -70,7 +67,7 @@ class View:
         self._make_button('unlimited', 'Times', 3, 5)
 
 
-        self._to_another_view('Read History', 4, 0)
+        self._to_another_view('Modify History', 4, 0)
         self._to_another_view('Battle Information', 4, 1)
 
         self._make_label('AP Recovery', 4, 2)
@@ -82,8 +79,28 @@ class View:
         self._make_button('delete', 'delete', 29, 1)
 
         self._make_label('Now Status', 30, 0)
-        self._make_now_status_support_label(31, 0)
-        self._make_now_status_skill_label(32, 0)
+        self._make_now_status_support_column(31, 0)
+        self._make_now_status_skill_column(1, 33, 0)
+        self._make_now_status_skill_column(2, 39, 0)
+        self._make_now_status_skill_column(3, 45, 0)
+        # self._make_now_status_skill_label(52,0)
+
+
+    def _make_stringVar(self):
+        self.times = tk.StringVar()
+        self.get_hwnd_label = tk.StringVar()
+        self.history_name = tk.StringVar()
+        self.now_status_skill = tk.StringVar()
+        self.now_status_support = tk.StringVar()
+        self.now_status_support_type = tk.StringVar()
+        self.now_status_support_character = tk.StringVar()
+
+        self.battle_skill_Var = dict()
+        for i in ['b1', 'b2', 'b3']:
+            for j in ['p0', 'p1', 'p2', 'p3']:
+                for k in ['s1', 's2', 's3', 'NP']:
+                    player = i + j + k
+                    self.battle_skill_Var[player] = tk.StringVar()
 
 
     def _make_main_frame(self):
@@ -174,14 +191,29 @@ class View:
         button = ttk.Button(self.root, text=button_Text, command=button_event)
         button['text'] = text
         button.grid(row=x, column=y)
+    
 
+    def _battle_skill_Var(self):
+        self.battleSkill['b1p0NP'] = ''
+        self.battleSkill['b2p0NP'] = ''
+        self.battleSkill['b3p0NP'] = ''
+
+        for i in ['b1', 'b2', 'b3']:
+            for j in ['p0', 'p1', 'p2', 'p3']:
+                for k in ['s1', 's2', 's3', 'NP']:
+                    player = i + j + k
+                    self.battle_skill_Var[player].set(self.battleSkill[player])
+    
     
     def set_current_status(self):
         if self.history_title_combobox.get() == '':
             self.supporter = ''
             self.battleSkill = ''
             self.now_status_support.set(self.supporter)
+            self.now_status_support_type.set(self.supporter['type'])
+            self.now_status_support_character.set(self.supporter['character'])
             self.now_status_skill.set(self.battleSkill)
+            self._battle_skill_Var()
 
         else:
             self.now_history_name = self.history_title_combobox.get()
@@ -189,7 +221,10 @@ class View:
             self.battleSkill = self.statusController.read_history(self.now_history_name)[1]
 
             self.now_status_support.set(self.supporter)
+            self.now_status_support_type.set(self.supporter['type'])
+            self.now_status_support_character.set(self.supporter['character'])
             self.now_status_skill.set(self.battleSkill)
+            self._battle_skill_Var()
         
 
     def _to_another_view(self, text, x, y):
@@ -200,7 +235,7 @@ class View:
                     BattleInformationView(self).main()
                     print('view: BattleInformationView end')
 
-            elif text == 'Read History':
+            elif text == 'Modify History':
                 if self.ReadHistoryViewOpen == False:
                     self.now_history_name = self.history_title_combobox.get()
                     if self.history_title_combobox.get() == '':
@@ -244,6 +279,38 @@ class View:
     def _make_now_status_skill_label(self, x, y):
         now_status_skill = tk.Label(self.root, textvariable=self.now_status_skill, state='disabled', wraplength=600)
         now_status_skill.grid(row=x, column=y, columnspan=4)
+    
+
+    def _make_now_status_support_column(self, x, y):
+        self._make_label('support_type', x, y)
+        self._make_label('support_character', x, y+1)
+        support_type_column = tk.Label(self.root, textvariable=self.now_status_support_type, state='disabled')
+        support_type_column.grid(row=x+1, column=y)
+        support_character_column = tk.Label(self.root, textvariable=self.now_status_support_character, state='disabled')
+        support_character_column.grid(row=x+1, column=y+1)
+    
+    def _make_now_status_skill_column(self, battle, x, y):
+        self._make_label(f'Battle{battle}', x, y)
+        self._make_label('Skill1', x, y+1)
+        self._make_label('Skill2', x, y+2)
+        self._make_label('Skill3', x, y+3)
+        self._make_label('Noble Phantasm ', x, y+4)
+        self._make_label('Clothes', x+1, y)
+        self._make_label('Player1', x+2, y)
+        self._make_label('Player2', x+3, y)
+        self._make_label('Player3', x+4, y)
+        m = 1
+        n = 1
+        for i in ['p0', 'p1', 'p2', 'p3']:
+            for j in ['s1', 's2', 's3', 'NP']:
+                player = 'b' + str(battle) + i + j
+                battle_label = tk.Label(self.root, textvariable=self.battle_skill_Var[player], state='disabled')
+                # battle_label = tk.Label(self.root, textvariable='A', state='disabled')
+                battle_label.grid(row=x+m, column=y+n)
+                n +=1
+            n = 1
+            m += 1
+        self._make_label('', x+5, y)
 
 
     def _make_history_title_combobox(self, x, y):

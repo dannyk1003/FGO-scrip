@@ -1,5 +1,5 @@
 # 點擊流程
-import tkinter.messagebox
+# import tkinter.messagebox
 import threading
 import inspect
 import ctypes
@@ -58,7 +58,7 @@ class clickController:
             self.model.runScrip()
         self.thread_start = 'No'
         print('success')
-        tkinter.messagebox.showinfo("Info", "Scrip End")
+        # tkinter.messagebox.showinfo("Info", "Scrip End")
     
     def control(self, innerHwnd):
         print(innerHwnd)

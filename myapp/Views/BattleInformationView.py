@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 import tkinter.messagebox
+# from Views.new_supportView import new_supportView
 
 
 class BattleInformationView:
@@ -10,9 +11,11 @@ class BattleInformationView:
         self.root.title('Battle Information')
         self.root.protocol('WM_DELETE_WINDOW', self.exit)
         self.BattleInformationViewOpen = True
+        self.new_supportViewOpen = False
         self.view.statusController.battleSkill_init()
 
         self._support_area(0, 'support')
+        # self._make_button('new_support', 1, 2)
         self._make_label('Select your Battle Skill', 3, 0)
         self._battle_area('battle1', 4)
         self._battle_area('battle2', 13)
@@ -160,7 +163,34 @@ class BattleInformationView:
 
         combobox.bind("<<ComboboxSelected>>", Noble_Phantasm_func)
 
+    
     def _make_button(self, text, x, y):
+        def Done():
+            name = self.entry.get()
+            if name == '':
+                tkinter.messagebox.showerror("Name Error", "Please enter a valid name")
+
+            elif name in self.view.history_title:
+                tkinter.messagebox.showerror("Name Error", "duplicate name")
+                
+            else:
+                self.view.statusController.Save(name)
+                self.view.get_history_title()
+                self.view.history_title_combobox.set(name)
+                self.view.set_current_status()
+                self.exit()
+        
+        def Cancel():
+            self.view.history_title_combobox.set('')
+            self.view.set_current_status()
+            self.exit()
+
+        
+        def new_support():
+            if self.new_supportViewOpen == False:
+                self.new_supportViewOpen = True
+                new_supportView(self).main()
+
 
         def button_event():
             if text == 'Done':
@@ -183,7 +213,7 @@ class BattleInformationView:
             
 
         button_Text = tk.StringVar()
-        button = ttk.Button(self.root, text=button_Text, command=button_event)
+        button = ttk.Button(self.root, text=button_Text, command=eval(text))
         button['text'] = text
         button.grid(row=x, column=y)
 

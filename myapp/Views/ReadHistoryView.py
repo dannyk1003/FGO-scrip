@@ -173,11 +173,13 @@ class ReadHistoryView:
                     else:
                         self.view.statusController.modify(self.view.now_history_name, name)
                         self.view.history_title_combobox.set(name)
+                        self.view.set_current_status()
                         self.exit()
 
                 else:
                     self.view.statusController.modify(self.view.now_history_name, name)
                     self.view.history_title_combobox.set(name)
+                    self.view.set_current_status()
                     self.exit()
 
                 
